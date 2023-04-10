@@ -1,0 +1,153 @@
+package com.interview.interviewservice.service.impl;
+
+import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.entity.Company;
+import com.interview.interviewservice.entity.Team;
+import com.interview.interviewservice.entity.User;
+import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
+import com.interview.interviewservice.mapper.DTOS.TeamDTO;
+import com.interview.interviewservice.mapper.DTOS.UserDTO;
+import com.interview.interviewservice.mapper.mappers.TeamMapper;
+import com.interview.interviewservice.model.Flag;
+import com.interview.interviewservice.repository.CompanyRepository;
+import com.interview.interviewservice.repository.TeamRepository;
+import com.interview.interviewservice.repository.UserRepository;
+import com.interview.interviewservice.service.InvitesService;
+import com.interview.interviewservice.service.TeamService;
+import com.interview.interviewservice.service.UserService;
+import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.Optional;
+
+@Service
+public class TeamServiceImpl implements TeamService {
+
+    private final TeamRepository teamRepository;
+    private final TeamMapper teamMapper;
+    private final UserRepository userRepository;
+    private final UserService userService;
+
+    private final CompanyRepository companyRepository;
+
+    private final InvitesService invitesService;
+
+    public TeamServiceImpl(TeamRepository teamRepository, TeamMapper teamMapper, UserRepository userRepository, UserService userService, CompanyRepository companyRepository, InvitesService invitesService) {
+        this.teamRepository = teamRepository;
+        this.teamMapper = teamMapper;
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.companyRepository = companyRepository;
+        this.invitesService = invitesService;
+    }
+
+
+    @Override
+    public Team create(TeamDTO teamDTO) throws CustomException {
+        validation(teamDTO);
+        Team team = teamMapper.teamDTOToTeam(teamDTO);
+        team.setFlag(Flag.ENABLED);
+
+        team = teamRepository.save(team);
+
+//        if(teamDTO.getTeamMembers().size() > 0){
+//            Team finalTeam = team;
+//            teamDTO.getTeamMembers().forEach(user -> {
+//                if(Objects.isNull(user.getId())){
+//                    InvitesDTO invitesDTO = new InvitesDTO(user.getSurname(), user.getOtherNames(), user.getEmail(), finalTeam.getId());
+//                    try {
+//                        this.invitesService.create(invitesDTO);
+//                    } catch (CustomException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }else{
+//                    Optional<User> currentUser = userRepository.findById(user.getId());
+//                    if(currentUser.isPresent()){
+//                        currentUser.get().setTeam(finalTeam);
+//                        UserDTO userDTO = userService.mapper(currentUser.get());
+//                        try {
+//                            this.userService.update(userDTO);
+//                        } catch (CustomException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                }
+//            });
+//        }
+
+        return team;
+    }
+
+    @Override
+    public void delete(long teamId) throws CustomException {
+        Optional<Team> team = teamRepository.findById(teamId);
+        if(team.isPresent()){
+            team.get().setFlag(Flag.DISABLED);
+        }else{
+            throw new CustomException("Team Not Found");
+        }
+    }
+
+    @Override
+    public TeamDTO find(Long teamId) throws CustomException {
+        Optional<Team> team = teamRepository.findById(teamId);
+        if(team.isPresent()){
+            return teamMapper.teamToTeamDTO(team.get());
+        }else{
+            throw new CustomException("Team Not Found");
+        }
+    }
+
+    @Override
+    public void update(TeamDTO teamDTO) throws CustomException {
+        Optional<Team> savedTeam = teamRepository.findById(teamDTO.getId());
+        Company company = companyRepository.findCompanyByCompanyId(teamDTO.getCompanyId());
+
+        if(savedTeam.isPresent() && Objects.nonNull(company)){
+            validateUpdate(teamDTO, savedTeam.get());
+            Team team = teamMapper.teamDTOToTeam(teamDTO);
+            team.setCompany(company);
+
+            teamRepository.save(team);
+        }else{
+            throw new CustomException("Team detail not found");
+        }
+
+    }
+
+    private void validation(TeamDTO teamDTO) throws CustomException{
+
+        Company company = companyRepository.findCompanyByCompanyId(teamDTO.getCompanyId());
+        if(Objects.isNull(company)){
+            throw new CustomException("Company detail not found");
+        }
+
+        if(teamRepository.existsByNameAndCompany(teamDTO.getName(), company)){
+            throw new CustomException("Team Name Already Exist");
+        }
+
+        if(teamRepository.existsBySectionAndCompany(teamDTO.getSection(), company)){
+            throw new CustomException("Section Already Exist");
+        }
+    }
+
+    private void validateUpdate(TeamDTO teamDTO, Team savedTeam) throws CustomException {
+        Company company = companyRepository.findCompanyByCompanyId(teamDTO.getCompanyId());
+
+        if(Objects.isNull(company)){
+            throw new CustomException("Company detail not found");
+        }
+
+        if(!savedTeam.getName().equalsIgnoreCase(teamDTO.getName())){
+            if(teamRepository.existsByNameAndCompany(teamDTO.getName(), company)){
+                throw new CustomException("Team Name Already Exist");
+            }
+        }
+
+        if(!savedTeam.getSection().equalsIgnoreCase(teamDTO.getSection())){
+            if(teamRepository.existsBySectionAndCompany(teamDTO.getSection(), company)){
+                throw new CustomException("Section Already Exist");
+            }
+        }
+    }
+}

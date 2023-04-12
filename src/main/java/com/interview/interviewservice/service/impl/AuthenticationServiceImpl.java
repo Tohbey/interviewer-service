@@ -7,14 +7,11 @@ import com.interview.interviewservice.dtos.AuthenticationRequest;
 import com.interview.interviewservice.dtos.AuthenticationResponse;
 import com.interview.interviewservice.dtos.ForgotPasswordRequest;
 import com.interview.interviewservice.dtos.ResetPasswordRequest;
-import com.interview.interviewservice.entity.PasswordRetrieve;
-import com.interview.interviewservice.entity.RememberToken;
+import com.interview.interviewservice.entity.Token;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.jwt.JwtUtils;
-import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.UserMapper;
-import com.interview.interviewservice.repository.PasswordRetrieveRepository;
-import com.interview.interviewservice.repository.RememberTokenRepository;
+import com.interview.interviewservice.repository.TokenRepository;
 import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.UserService;
@@ -50,25 +47,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
 
-    private final RememberTokenRepository rememberTokenRepository;
+    private final TokenRepository tokenRepository;
 
     private final UserMapper userMapper;
 
     private final UserService userService;
 
-    private final PasswordRetrieveRepository passwordRetrieveRepository;
 
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager,
                                      UserRepository userRepository,
-                                     RememberTokenRepository rememberTokenRepository,
+                                     TokenRepository tokenRepository,
                                      UserMapper userMapper,
-                                     UserService userService, PasswordRetrieveRepository passwordRetrieveRepository) {
+                                     UserService userService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
-        this.rememberTokenRepository = rememberTokenRepository;
         this.userMapper = userMapper;
         this.userService = userService;
-        this.passwordRetrieveRepository = passwordRetrieveRepository;
+        this.tokenRepository = tokenRepository;
     }
 
 
@@ -103,7 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         //find token
-        Optional<RememberToken> rememberToken = rememberTokenRepository.findRememberTokenByToken(token);
+        Optional<Token> rememberToken = tokenRepository.findTokenByTokenAndUser(token, user.get());
         if (rememberToken.isEmpty()) {
             throw new CustomException("User Not Found. for EMAIL value " + email);
         }
@@ -117,7 +112,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.get().setIsActive(true);
         user.get().setToken(null);
 
-        rememberTokenRepository.deleteById(rememberToken.get().getId());
+        tokenRepository.deleteById(rememberToken.get().getId());
 
 //        userService.update(user.get(), user.get().getId());
     }
@@ -140,8 +135,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         String token = RandomStringUtils.randomAlphabetic(20);
-        PasswordRetrieve passwordRetrieve = new PasswordRetrieve();
-        passwordRetrieve.setResetPasswordToken(token);
+        Token passwordRetrieve = new Token();
+        passwordRetrieve.setToken(token);
 
         //adding 20 minutes to the current time
         Calendar present = Calendar.getInstance();
@@ -150,10 +145,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         //save token
         passwordRetrieve.setUser(user.get());
-        passwordRetrieve.setResetPasswordExpires(expiredAt);
-        PasswordRetrieve savedPasswordRetrieveToken = passwordRetrieveRepository.save(passwordRetrieve);
+        passwordRetrieve.setExpiredAt(expiredAt);
+        Token savedPasswordRetrieveToken = tokenRepository.save(passwordRetrieve);
 
-        user.get().setPasswordRetrieve(savedPasswordRetrieveToken);
+        user.get().setToken(savedPasswordRetrieveToken);
 
 
 //        Optional<UserDTO> returnDTO = userService.update(user.get(), user.get().getId());
@@ -166,12 +161,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException("User Not Found. for EMAIL value " + email);
         }
 
-        Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveRepository.findPasswordRetrieveByResetPasswordToken(token);
+        Optional<Token> passwordRetrieve = tokenRepository.findTokenByTokenAndUser(token, user.get());
         if (passwordRetrieve.isEmpty()) {
             throw new CustomException("Token Not Found. for TOKEN value " + token);
         }
 
-        if (!user.get().getPasswordRetrieve().getResetPasswordToken().equals(passwordRetrieve.get().getResetPasswordToken())) {
+        if (!user.get().getToken().getToken().equals(passwordRetrieve.get().getToken())) {
             throw new Exception("Incorrect Token");
         }
 
@@ -185,13 +180,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String encryptPwd = passwordEncoder.encode(resetPasswordRequest.getPassword());
         user.get().setPassword(encryptPwd);
 
-        Optional<PasswordRetrieve> passwordRetrieve = passwordRetrieveRepository.findPasswordRetrieveByResetPasswordToken(resetPasswordRequest.getToken());
+        Optional<Token> passwordRetrieve = tokenRepository.findTokenByTokenAndUser(resetPasswordRequest.getToken(), user.get());
         if (passwordRetrieve.isEmpty()) {
             throw new CustomException("Token Not Found. for TOKEN value " + resetPasswordRequest.getToken());
         }
-        passwordRetrieveRepository.deleteById(passwordRetrieve.get().getId());
+        tokenRepository.deleteById(passwordRetrieve.get().getId());
 
-        user.get().setPasswordRetrieve(null);
+        user.get().setToken(null);
 
 //        userService.update();
     }

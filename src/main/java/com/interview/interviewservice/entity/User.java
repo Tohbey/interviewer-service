@@ -3,7 +3,6 @@ package com.interview.interviewservice.entity;
 import com.interview.interviewservice.entity.core.FlagableAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.envers.NotAudited;
 
 import java.util.Date;
 
@@ -36,11 +35,7 @@ public class User extends FlagableAuditableEntity {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "remember_token_id")
-    private RememberToken token;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "password_retrieve_id")
-    private PasswordRetrieve passwordRetrieve;
+    private Token token;
 
     @OneToOne
     private Role role;

@@ -1,7 +1,5 @@
 package com.interview.interviewservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.interview.interviewservice.entity.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +14,7 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
-public class RememberToken extends BaseEntity {
+public class Token extends BaseEntity {
 
     private String token;
     @Column(name = "expired_at")

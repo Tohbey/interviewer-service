@@ -3,6 +3,7 @@ package com.interview.interviewservice.service.impl;
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Team;
+import com.interview.interviewservice.jwt.JwtAuthenticationEntryPoint;
 import com.interview.interviewservice.mapper.DTOS.CompanyDTO;
 import com.interview.interviewservice.mapper.DTOS.RoleDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
@@ -16,6 +17,10 @@ import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.service.CompanyService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,6 +41,10 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final TeamMapper teamMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private static final Logger logger = LoggerFactory.getLogger(CompanyServiceImpl .class);
 
     public CompanyServiceImpl(CompanyRepository companyRepository, UserService userService, CompanyMapper companyMapper, TeamRepository teamRepository, TeamMapper teamMapper) {
         this.companyRepository = companyRepository;
@@ -55,6 +64,10 @@ public class CompanyServiceImpl implements CompanyService {
         company = companyRepository.save(company);
 
         String password = RandomStringUtils.randomAlphabetic(10);
+        logger.info("Password: {}",password);
+
+        String encryptedPassword = passwordEncoder.encode(password);
+
         if(Objects.nonNull(company.getContactData())){
             RoleDTO roleDTO = new RoleDTO(1L, RoleEnum.ADMIN_USER);
             UserDTO userDTO = new UserDTO(
@@ -67,7 +80,7 @@ public class CompanyServiceImpl implements CompanyService {
                     company.getPicture(),
                     company.getCompanyId(),
                     true,
-                    password, roleDTO, new TeamDTO());
+                    encryptedPassword, roleDTO, new TeamDTO());
 
             userService.create(userDTO);
         }

@@ -33,10 +33,6 @@ public class User extends FlagableAuditableEntity {
 
     private Boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "remember_token_id")
-    private Token token;
-
     @OneToOne
     private Role role;
     public String getUserFullName(){

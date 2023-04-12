@@ -98,19 +98,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         //find token
-        Optional<Token> rememberToken = tokenRepository.findTokenByTokenAndUser(token, user.get());
+        Optional<Token> rememberToken = tokenRepository.findTokenByUser(user.get());
         if (rememberToken.isEmpty()) {
             throw new CustomException("User Not Found. for EMAIL value " + email);
         }
 
         //validate the token
-        if (!user.get().getToken().getToken().equals(rememberToken.get().getToken())) {
+        if (!rememberToken.get().getToken().equals(token)) {
             throw new Exception("Incorrect Token");
         }
 
         //update user
         user.get().setIsActive(true);
-        user.get().setToken(null);
 
         tokenRepository.deleteById(rememberToken.get().getId());
 
@@ -124,7 +123,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+        Optional<User> user = getCurrentUser();
 
+        if (!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())) {
+            throw new Exception("Invalid Old Password");
+        }
+
+        String pwd = forgotPasswordRequest.getNewPassword();
+        String encryptPwd = passwordEncoder.encode(pwd);
+        user.get().setPassword(encryptPwd);
+        user.get().setIsNewUser(false);
+
+        userRepository.save(user.get());
     }
 
     @Override
@@ -146,12 +156,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //save token
         passwordRetrieve.setUser(user.get());
         passwordRetrieve.setExpiredAt(expiredAt);
-        Token savedPasswordRetrieveToken = tokenRepository.save(passwordRetrieve);
-
-        user.get().setToken(savedPasswordRetrieveToken);
-
-
-//        Optional<UserDTO> returnDTO = userService.update(user.get(), user.get().getId());
+        tokenRepository.save(passwordRetrieve);
     }
 
     @Override
@@ -161,12 +166,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException("User Not Found. for EMAIL value " + email);
         }
 
-        Optional<Token> passwordRetrieve = tokenRepository.findTokenByTokenAndUser(token, user.get());
+        Optional<Token> passwordRetrieve = tokenRepository.findTokenByUser(user.get());
         if (passwordRetrieve.isEmpty()) {
             throw new CustomException("Token Not Found. for TOKEN value " + token);
         }
 
-        if (!user.get().getToken().getToken().equals(passwordRetrieve.get().getToken())) {
+        if (!token.equals(passwordRetrieve.get().getToken())) {
             throw new Exception("Incorrect Token");
         }
 
@@ -185,10 +190,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException("Token Not Found. for TOKEN value " + resetPasswordRequest.getToken());
         }
         tokenRepository.deleteById(passwordRetrieve.get().getId());
-
-        user.get().setToken(null);
-
-//        userService.update();
     }
 
     @Override

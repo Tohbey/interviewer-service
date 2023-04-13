@@ -36,4 +36,6 @@ public class UserDTO extends BaseDTO {
     private RoleDTO role;
 
     private TeamDTO teamDTO;
+
+    private Boolean isActive;
 }

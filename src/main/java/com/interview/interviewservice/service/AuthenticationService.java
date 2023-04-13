@@ -22,5 +22,5 @@ public interface AuthenticationService {
 
     void resetPassword(ResetPasswordRequest resetPasswordRequest) throws Exception;
 
-    Optional<User> getCurrentUser() throws CustomException;
+    UserDTO getCurrentUser() throws CustomException;
 }

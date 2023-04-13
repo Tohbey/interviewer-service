@@ -10,6 +10,7 @@ import com.interview.interviewservice.dtos.ResetPasswordRequest;
 import com.interview.interviewservice.entity.Token;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.jwt.JwtUtils;
+import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.UserMapper;
 import com.interview.interviewservice.repository.TokenRepository;
 import com.interview.interviewservice.repository.UserRepository;
@@ -49,7 +50,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenRepository tokenRepository;
 
-    private final UserMapper userMapper;
 
     private final UserService userService;
 
@@ -57,11 +57,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager,
                                      UserRepository userRepository,
                                      TokenRepository tokenRepository,
-                                     UserMapper userMapper,
                                      UserService userService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
         this.userService = userService;
         this.tokenRepository = tokenRepository;
     }
@@ -113,7 +111,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         tokenRepository.deleteById(rememberToken.get().getId());
 
-//        userService.update(user.get(), user.get().getId());
+        userService.update(userService.mapper(user.get()));
     }
 
     @Override
@@ -123,7 +121,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
-        Optional<User> user = getCurrentUser();
+        Optional<User> user = getCurrent();
 
         if (!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())) {
             throw new Exception("Invalid Old Password");
@@ -190,10 +188,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException("Token Not Found. for TOKEN value " + resetPasswordRequest.getToken());
         }
         tokenRepository.deleteById(passwordRetrieve.get().getId());
+
+        user.map(user1 -> {
+            user1.setPassword(user.get().getPassword());
+            return userRepository.save(user1);
+        }).orElseGet(() -> {
+            return userRepository.save(user.get());
+        });
     }
 
     @Override
-    public Optional<User> getCurrentUser() throws CustomException {
+    public UserDTO getCurrentUser() throws CustomException {
         CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userDetail.getUsername();
         Optional<User> user = userRepository.findUserByEmail(email);
@@ -201,6 +206,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException("User Not Found. for EMAIL value " + email);
         }
 
-        return Optional.of(user.get());
+        return userService.mapper(user.get());
+    }
+
+    private Optional<User> getCurrent() throws CustomException {
+        CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetail.getUsername();
+        Optional<User> user = userRepository.findUserByEmail(email);
+        if (user.isEmpty()) {
+            throw new CustomException("User Not Found. for EMAIL value " + email);
+        }
+
+        return user;
     }
 }

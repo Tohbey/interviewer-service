@@ -5,6 +5,7 @@ import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.JobDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.service.InterviewService;
 import com.interview.interviewservice.service.JobService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,11 @@ public class JobController {
 
     private final JobService jobService;
 
-    public JobController(JobService jobService) {
+    private final InterviewService interviewService;
+
+    public JobController(JobService jobService, InterviewService interviewService) {
         this.jobService = jobService;
+        this.interviewService = interviewService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save")
@@ -74,6 +78,21 @@ public class JobController {
             jobService.update(jobDTO);
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Job Successfully Created","Saved", Message.Severity.INFO));
+        }catch (Exception e){
+            e.printStackTrace();
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/interview/{jobId}")
+    public IDataResponse getInterviewsByJob(@PathVariable ("jobId") Long jobId){
+        IDataResponse dataResponse = new IDataResponse();
+        try{
+            dataResponse.setData(interviewService.findInterviewsByJob(jobId));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("Interviews Successfully Retrieved","Retrieved", Message.Severity.INFO));
         }catch (Exception e){
             e.printStackTrace();
             dataResponse.setValid(false);

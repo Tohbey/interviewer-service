@@ -5,6 +5,7 @@ import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.service.InterviewService;
 import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.TeamService;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,12 @@ public class TeamController {
 
     private final InvitesService invitesService;
 
+    private final InterviewService interviewService;
 
-    public TeamController(TeamService teamService, InvitesService invitesService) {
+    public TeamController(TeamService teamService, InvitesService invitesService, InterviewService interviewService) {
         this.teamService = teamService;
         this.invitesService = invitesService;
+        this.interviewService = interviewService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save")
@@ -95,6 +98,22 @@ public class TeamController {
             dataResponse.setData(invitesService.findInvitesByTeam(teamId));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Invites Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
+        }catch (Exception e){
+            e.printStackTrace();
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/interview/{teamId}")
+    public IDataResponse getInterviewsByJob(@PathVariable ("teamId") Long teamId){
+        IDataResponse dataResponse = new IDataResponse();
+        try{
+            dataResponse.setData(interviewService.findInterviewsByTeam(teamId));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("Interviews Successfully Retrieved","Retrieved", Message.Severity.INFO));
         }catch (Exception e){
             e.printStackTrace();
             dataResponse.setValid(false);

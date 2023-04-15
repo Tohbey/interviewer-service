@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @Transactional
     public void create(CompanyDTO companyDTO) throws CustomException {
         validate(companyDTO);
         Company company = companyMapper.companyDTOToCompany(companyDTO);
@@ -80,7 +82,7 @@ public class CompanyServiceImpl implements CompanyService {
                     company.getPicture(),
                     company.getCompanyId(),
                     true,
-                    encryptedPassword, roleDTO, new TeamDTO());
+                    encryptedPassword, roleDTO, null, false);
 
             userService.create(userDTO);
         }

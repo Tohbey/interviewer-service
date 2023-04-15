@@ -26,7 +26,7 @@ public class AuthenticationController {
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/login")
     public IDataResponse createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
         IDataResponse dataResponse = new IDataResponse();
         try {

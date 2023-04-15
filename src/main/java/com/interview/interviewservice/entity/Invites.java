@@ -1,6 +1,7 @@
 package com.interview.interviewservice.entity;
 
 import com.interview.interviewservice.entity.core.FlagableAuditableEntity;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class Invites extends FlagableAuditableEntity {

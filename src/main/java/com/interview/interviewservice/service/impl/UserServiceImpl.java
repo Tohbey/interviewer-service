@@ -1,27 +1,19 @@
 package com.interview.interviewservice.service.impl;
 
 import com.interview.interviewservice.Util.CustomException;
-import com.interview.interviewservice.entity.Company;
-import com.interview.interviewservice.entity.Role;
-import com.interview.interviewservice.entity.Team;
-import com.interview.interviewservice.entity.User;
+import com.interview.interviewservice.entity.*;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.RoleMapper;
 import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.mapper.mappers.UserMapper;
 import com.interview.interviewservice.model.Flag;
-import com.interview.interviewservice.repository.CompanyRepository;
-import com.interview.interviewservice.repository.RoleRepository;
-import com.interview.interviewservice.repository.TeamRepository;
-import com.interview.interviewservice.repository.UserRepository;
+import com.interview.interviewservice.repository.*;
 import com.interview.interviewservice.service.UserService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -39,7 +31,9 @@ public class UserServiceImpl implements UserService {
 
     private final TeamMapper teamMapper;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, CompanyRepository companyRepository, RoleRepository roleRepository, RoleMapper roleMapper, TeamRepository teamRepository, TeamMapper teamMapper) {
+    private final TokenRepository tokenRepository;
+
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, CompanyRepository companyRepository, RoleRepository roleRepository, RoleMapper roleMapper, TeamRepository teamRepository, TeamMapper teamMapper, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.companyRepository = companyRepository;
@@ -47,6 +41,7 @@ public class UserServiceImpl implements UserService {
         this.roleMapper = roleMapper;
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -60,7 +55,22 @@ public class UserServiceImpl implements UserService {
         user.setCompany(company);
         role.ifPresent(user::setRole);
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        Token verifyToken = new Token();
+        String token = RandomStringUtils.randomAlphabetic(30);
+
+
+        //adding 20 minutes to the current time
+        Calendar present = Calendar.getInstance();
+        long timeInSecs = present.getTimeInMillis();
+        Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
+
+        verifyToken.setToken(token);
+        verifyToken.setUser(savedUser);
+        verifyToken.setExpiredAt(expiredAt);
+
+        tokenRepository.save(verifyToken);
     }
 
     @Override
@@ -128,8 +138,11 @@ public class UserServiceImpl implements UserService {
         Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());
         user.setCompany(company);
         role.ifPresent(user::setRole);
-        Optional<Team> team = teamRepository.findById(userDTO.getTeamDTO().getId());
-        team.ifPresent(user::setTeam);
+
+        if(Objects.nonNull(userDTO.getTeamDTO())){
+            Optional<Team> team = teamRepository.findById(userDTO.getTeamDTO().getId());
+            team.ifPresent(user::setTeam);
+        }
 
         userRepository.save(user);
     }
@@ -163,10 +176,12 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        if(!savedUser.getTeam().getName()
-                .equalsIgnoreCase(userDTO.getTeamDTO().getName())){
-            if (!teamRepository.existsByNameAndCompany(userDTO.getTeamDTO().getName(), company)){
-                throw new CustomException("Team Does Not Exist");
+        if(Objects.nonNull(userDTO.getTeamDTO()) && Objects.nonNull(savedUser.getTeam())){
+            if(!savedUser.getTeam().getName()
+                    .equalsIgnoreCase(userDTO.getTeamDTO().getName())){
+                if (!teamRepository.existsByNameAndCompany(userDTO.getTeamDTO().getName(), company)){
+                    throw new CustomException("Team Does Not Exist");
+                }
             }
         }
     }
@@ -190,8 +205,10 @@ public class UserServiceImpl implements UserService {
             throw new CustomException("Role Does Not Exist");
         }
 
-        if (!teamRepository.existsByNameAndCompany(user.getTeamDTO().getName(), company)){
-            throw new CustomException("Team Does Not Exist");
+        if(Objects.nonNull(user.getTeamDTO())){
+            if (!teamRepository.existsByNameAndCompany(user.getTeamDTO().getName(), company)){
+                throw new CustomException("Team Does Not Exist");
+            }
         }
     }
 }

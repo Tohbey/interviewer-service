@@ -17,6 +17,8 @@ import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -53,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl .class);
 
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager,
                                      UserRepository userRepository,
@@ -88,6 +92,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public void verifyUser(String email, String token) throws Exception {
         //find user
         Optional<User> user = userRepository.findUserByEmail(email);

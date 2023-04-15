@@ -2,6 +2,7 @@ package com.interview.interviewservice.config;
 
 
 import com.interview.interviewservice.controller.AuthenticationController;
+import com.interview.interviewservice.controller.CompanyController;
 import com.interview.interviewservice.controller.UserController;
 import com.interview.interviewservice.jwt.JwtAuthenticationEntryPoint;
 import com.interview.interviewservice.jwt.JwtRequestFilter;
@@ -44,18 +45,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // We don't need CSRF for this example
         http.cors().and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL).permitAll()
+                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/login").permitAll()
                 .requestMatchers(HttpMethod.PATCH, AuthenticationController.BASE_URL + "/verify").permitAll()
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset-password").permitAll()
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset").permitAll()
+                .requestMatchers(HttpMethod.POST, CompanyController.BASE_URL + "/save").permitAll()
                 .requestMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll().
                 // all other requests need to be authenticated
                 anyRequest().authenticated().and().
-                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

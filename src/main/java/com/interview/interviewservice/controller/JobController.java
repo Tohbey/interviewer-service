@@ -7,6 +7,7 @@ import com.interview.interviewservice.mapper.DTOS.JobDTO;
 import com.interview.interviewservice.model.Message;
 import com.interview.interviewservice.service.InterviewService;
 import com.interview.interviewservice.service.JobService;
+import com.interview.interviewservice.service.JobTicketService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -21,9 +22,12 @@ public class JobController {
 
     private final InterviewService interviewService;
 
-    public JobController(JobService jobService, InterviewService interviewService) {
+    private final JobTicketService jobTicketService;
+
+    public JobController(JobService jobService, InterviewService interviewService, JobTicketService jobTicketService) {
         this.jobService = jobService;
         this.interviewService = interviewService;
+        this.jobTicketService = jobTicketService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save")
@@ -91,6 +95,22 @@ public class JobController {
         IDataResponse dataResponse = new IDataResponse();
         try{
             dataResponse.setData(interviewService.findInterviewsByJob(jobId));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("Interviews Successfully Retrieved","Retrieved", Message.Severity.INFO));
+        }catch (Exception e){
+            e.printStackTrace();
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/job-ticket/{jobId}")
+    public IDataResponse getTicketsByJob(@PathVariable ("jobId") Long jobId){
+        IDataResponse dataResponse = new IDataResponse();
+        try{
+            dataResponse.setData(jobTicketService.jobTicketsByJob(jobId));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Interviews Successfully Retrieved","Retrieved", Message.Severity.INFO));
         }catch (Exception e){

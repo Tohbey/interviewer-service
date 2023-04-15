@@ -16,4 +16,6 @@ public class JobTicketDTO extends BaseDTO {
     private StageDTO currentStage;
 
     private List<StageDTO> stages;
+
+    private JobDTO job;
 }

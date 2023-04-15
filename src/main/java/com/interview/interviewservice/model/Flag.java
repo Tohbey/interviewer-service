@@ -9,8 +9,10 @@ import java.util.Arrays;
 public enum Flag {
 
     NONE(Flag.NONE_ID),
-    ENABLED(Flag.ENABLED_ID), APPROVED(Flag.APPROVED_ID),
-    DISABLED(Flag.DISABLED_ID), REJECTED(Flag.REJECTED_ID);
+    DISABLED(Flag.DISABLED_ID),
+    ENABLED(Flag.ENABLED_ID),
+    APPROVED(Flag.APPROVED_ID),
+    REJECTED(Flag.REJECTED_ID);
 
     public static final int NONE_ID = 0;
 

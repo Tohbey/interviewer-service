@@ -34,6 +34,7 @@ public class CompanyController {
         this.jobService = jobService;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.POST, value = "/save")
     public IDataResponse createCompany(@RequestBody CompanyDTO companyDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -49,6 +50,7 @@ public class CompanyController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "/find/{companyId}")
     public IDataResponse<CompanyDTO> findCompany(@PathVariable("companyId") Long companyId){
         IDataResponse<CompanyDTO> dataResponse = new IDataResponse<CompanyDTO>();
@@ -64,6 +66,7 @@ public class CompanyController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{companyId}")
     public IDataResponse deleteCompany(@PathVariable("companyId") Long companyId){
         IDataResponse dataResponse = new IDataResponse();
@@ -80,6 +83,7 @@ public class CompanyController {
     }
 
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.PUT, value = "/update")
     public IDataResponse updateCompany(@RequestBody CompanyDTO companyDTO){
         IDataResponse dataResponse = new IDataResponse();

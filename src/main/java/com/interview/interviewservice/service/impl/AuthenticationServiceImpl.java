@@ -17,6 +17,7 @@ import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,38 +86,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
+            throw new Exception("USER DISABLED", e);
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            throw new Exception("INVALID CREDENTIALS", e);
         }
     }
 
     @Override
     @Transactional
     public void verifyUser(String email, String token) throws Exception {
-        //find user
-        Optional<User> user = userRepository.findUserByEmail(email);
-        if (user.isEmpty()) {
-            throw new CustomException("User Not Found. for EMAIL value " + email);
+        if(StringUtils.isNotEmpty(email) && StringUtils.isNotEmpty(token)){
+            //find user
+            Optional<User> user = userRepository.findUserByEmail(email);
+            if (user.isEmpty()) {
+                throw new CustomException("User Not Found. for EMAIL value " + email);
+            }
+
+            //find token
+            Optional<Token> rememberToken = tokenRepository.findTokenByUser(user.get());
+            if (rememberToken.isEmpty()) {
+                throw new CustomException("User Not Found. for EMAIL value " + email);
+            }
+
+            //validate the token
+            if (!rememberToken.get().getToken().equals(token)) {
+                throw new Exception("Incorrect Token");
+            }
+
+            //update user
+            user.get().setIsActive(true);
+
+            tokenRepository.deleteById(rememberToken.get().getId());
+
+            userService.update(userService.mapper(user.get()));
+        }else{
+            throw new Exception("Email or Token is Empty");
         }
-
-        //find token
-        Optional<Token> rememberToken = tokenRepository.findTokenByUser(user.get());
-        if (rememberToken.isEmpty()) {
-            throw new CustomException("User Not Found. for EMAIL value " + email);
-        }
-
-        //validate the token
-        if (!rememberToken.get().getToken().equals(token)) {
-            throw new Exception("Incorrect Token");
-        }
-
-        //update user
-        user.get().setIsActive(true);
-
-        tokenRepository.deleteById(rememberToken.get().getId());
-
-        userService.update(userService.mapper(user.get()));
     }
 
     @Override
@@ -142,24 +147,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void recover(String email) throws CustomException {
-        Optional<User> user = userRepository.findUserByEmail(email);
-        if (user.isEmpty()) {
-            throw new CustomException("User Not Found. for EMAIL value " + email);
+        if(StringUtils.isNotEmpty(email)){
+            Optional<User> user = userRepository.findUserByEmail(email);
+            if (user.isEmpty()) {
+                throw new CustomException("User Not Found. for EMAIL value " + email);
+            }
+
+            String token = RandomStringUtils.randomAlphabetic(40);
+            Token passwordRetrieve = new Token();
+            passwordRetrieve.setToken(token);
+
+            //adding 20 minutes to the current time
+            Calendar present = Calendar.getInstance();
+            long timeInSecs = present.getTimeInMillis();
+            Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
+
+            //save token
+            passwordRetrieve.setUser(user.get());
+            passwordRetrieve.setExpiredAt(expiredAt);
+            tokenRepository.save(passwordRetrieve);
+        }else{
+            throw new CustomException("Email is Empty");
         }
-
-        String token = RandomStringUtils.randomAlphabetic(20);
-        Token passwordRetrieve = new Token();
-        passwordRetrieve.setToken(token);
-
-        //adding 20 minutes to the current time
-        Calendar present = Calendar.getInstance();
-        long timeInSecs = present.getTimeInMillis();
-        Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
-
-        //save token
-        passwordRetrieve.setUser(user.get());
-        passwordRetrieve.setExpiredAt(expiredAt);
-        tokenRepository.save(passwordRetrieve);
     }
 
     @Override

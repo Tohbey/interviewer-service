@@ -50,11 +50,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/login").permitAll()
                 .requestMatchers(HttpMethod.PATCH, AuthenticationController.BASE_URL + "/verify").permitAll()
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset-password").permitAll()
+                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/forgot").permitAll()
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset").permitAll()
                 .requestMatchers(HttpMethod.POST, CompanyController.BASE_URL + "/save").permitAll()
-                .requestMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll().
+                .requestMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll()
                 // all other requests need to be authenticated
-                anyRequest().authenticated().and().
+                .anyRequest().authenticated().and().
                 exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

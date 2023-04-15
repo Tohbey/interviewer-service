@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         Token verifyToken = new Token();
-        String token = RandomStringUtils.randomAlphabetic(30);
+        String token = RandomStringUtils.randomAlphabetic(40);
 
 
         //adding 20 minutes to the current time

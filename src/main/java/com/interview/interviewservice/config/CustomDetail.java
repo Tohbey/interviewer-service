@@ -1,6 +1,7 @@
 package com.interview.interviewservice.config;
 
 import com.interview.interviewservice.entity.User;
+import com.interview.interviewservice.model.Flag;
 import lombok.Data;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,6 +47,6 @@ public class CustomDetail implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.user.getIsActive();
+        return this.user.getFlag().compareTo(Flag.ENABLED) == 0;
     }
 }

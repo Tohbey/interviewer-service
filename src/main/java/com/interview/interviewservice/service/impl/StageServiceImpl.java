@@ -78,6 +78,9 @@ public class StageServiceImpl implements StageService {
         Optional<Stage> stage = stageRepository.findById(stageId);
         if(stage.isPresent()){
             stage.get().setFlag(Flag.DISABLED);
+            stage.get().setLastModifiedDate(new Date());
+            stage.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+
             stageRepository.save(stage.get());
         }else{
             throw new CustomException("Stage Not found");

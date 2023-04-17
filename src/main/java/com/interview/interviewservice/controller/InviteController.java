@@ -4,6 +4,7 @@ import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.InvitesService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.Collections;
 @RequestMapping(InviteController.BASE_URL)
 public class InviteController {
 
-    public static final String BASE_URL="/api/v1/invite";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"invite"+BaseResource.RELATIVEPATH;
 
     private final InvitesService invitesService;
 
@@ -22,7 +23,7 @@ public class InviteController {
         this.invitesService = invitesService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createInvite(@RequestBody InvitesDTO invitesDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -38,7 +39,7 @@ public class InviteController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{inviteId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{inviteId}")
     public IDataResponse findInvite(@PathVariable("inviteId") Long inviteId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -54,7 +55,7 @@ public class InviteController {
     }
 
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{inviteId}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{inviteId}")
     public IDataResponse deleteInvite(@PathVariable("inviteId") Long inviteId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -69,7 +70,7 @@ public class InviteController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateInvite(@RequestBody InvitesDTO invitesDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {

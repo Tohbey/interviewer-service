@@ -5,6 +5,7 @@ import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.*;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.CompanyService;
 import com.interview.interviewservice.service.JobService;
 import com.interview.interviewservice.service.StageService;
@@ -17,7 +18,7 @@ import java.util.Collections;
 @RequestMapping(CompanyController.BASE_URL)
 public class CompanyController {
 
-    public static final String BASE_URL="/api/v1/comp";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"comp"+BaseResource.RELATIVEPATH;
 
     private final CompanyService companyService;
 
@@ -35,7 +36,7 @@ public class CompanyController {
     }
 
     //  Testing Completed.
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createCompany(@RequestBody CompanyDTO companyDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -51,7 +52,7 @@ public class CompanyController {
     }
 
     //  Testing Completed.
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{companyId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{companyId}")
     public IDataResponse<CompanyDTO> findCompany(@PathVariable("companyId") Long companyId){
         IDataResponse<CompanyDTO> dataResponse = new IDataResponse<CompanyDTO>();
         try {
@@ -67,7 +68,7 @@ public class CompanyController {
     }
 
     //  Testing Completed.
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{companyId}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{companyId}")
     public IDataResponse deleteCompany(@PathVariable("companyId") Long companyId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -84,7 +85,7 @@ public class CompanyController {
 
 
     //  Testing Completed.
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateCompany(@RequestBody CompanyDTO companyDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -99,7 +100,7 @@ public class CompanyController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/teams/{companyId}")
+    @RequestMapping(method = RequestMethod.GET, value = "teams/{companyId}")
     public IDataResponse<TeamDTO> findTeamsByCompany(@PathVariable("companyId") Long companyId){
         IDataResponse<TeamDTO> dataResponse = new IDataResponse<TeamDTO>();
         try {
@@ -115,7 +116,7 @@ public class CompanyController {
     }
 
     //  Testing Completed.
-    @RequestMapping(method = RequestMethod.GET, value = "/users/{companyId}/{flag}")
+    @RequestMapping(method = RequestMethod.GET, value = "users/{companyId}/{flag}")
     public IDataResponse<UserDTO> findUsersByCompanyAndFlag(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<UserDTO> dataResponse = new IDataResponse<UserDTO>();
         try {
@@ -131,7 +132,7 @@ public class CompanyController {
     }
 
     //  Testing Completed.
-    @RequestMapping(method = RequestMethod.GET, value = "/stages/{companyId}/{flag}")
+    @RequestMapping(method = RequestMethod.GET, value = "stages/{companyId}/{flag}")
     public IDataResponse<StageDTO> findStagesByCompany(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<StageDTO> dataResponse = new IDataResponse<StageDTO>();
         try {
@@ -146,7 +147,7 @@ public class CompanyController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/job/{companyId}/{flag}")
+    @RequestMapping(method = RequestMethod.GET, value = "job/{companyId}/{flag}")
     public IDataResponse<JobDTO> findJobsByCompanyAndFlag(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<JobDTO> dataResponse = new IDataResponse<JobDTO>();
         try {

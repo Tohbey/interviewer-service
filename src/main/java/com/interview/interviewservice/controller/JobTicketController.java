@@ -4,6 +4,7 @@ import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.JobTicketDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.JobTicketService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.Collections;
 @RequestMapping(JobTicketController.BASE_URL)
 public class JobTicketController {
 
-    public  static final String BASE_URL = "/api/v1/job-ticket";
+    public  static final String BASE_URL =  BaseResource.API+BaseResource.RELATIVEPATH+"job-ticket"+BaseResource.RELATIVEPATH;
 
     private final JobTicketService jobTicketService;
 
@@ -21,7 +22,7 @@ public class JobTicketController {
         this.jobTicketService = jobTicketService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createJobTicket(@RequestBody JobTicketDTO jobTicketDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -36,7 +37,7 @@ public class JobTicketController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{jobTicketId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{jobTicketId}")
     public IDataResponse findJobTicket(@PathVariable("jobTicketId") Long jobTicketId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -52,7 +53,7 @@ public class JobTicketController {
     }
 
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{jobTicketId}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{jobTicketId}")
     public IDataResponse deleteJobTicket(@PathVariable("jobTicketId") Long jobTicketId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -67,7 +68,7 @@ public class JobTicketController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateJobTicket(@RequestBody JobTicketDTO jobTicketDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {

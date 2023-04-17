@@ -5,6 +5,7 @@ import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.InterviewDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.InterviewService;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.util.Collections;
 @RequestMapping(value = InterviewController.BASE_URL)
 public class InterviewController {
 
-    public static final String BASE_URL="/api/v1/interview";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"interview"+BaseResource.RELATIVEPATH;
 
     private final InterviewService interviewService;
 
@@ -22,7 +23,7 @@ public class InterviewController {
         this.interviewService = interviewService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createInterview(@RequestBody InterviewDTO interviewDTO){
         IDataResponse dataResponse = new IDataResponse();
         try{
@@ -37,7 +38,7 @@ public class InterviewController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{interviewId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{interviewId}")
     public IDataResponse findInterview(@PathVariable("interviewId") Long interviewId){
         IDataResponse dataResponse = new IDataResponse();
         try{
@@ -52,7 +53,7 @@ public class InterviewController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{interviewId}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{interviewId}")
     public IDataResponse deleteInterview(@PathVariable("interviewId") Long interviewId){
         IDataResponse dataResponse = new IDataResponse();
         try{
@@ -67,7 +68,7 @@ public class InterviewController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateInterview(@RequestBody InterviewDTO interviewDTO){
         IDataResponse dataResponse = new IDataResponse();
         try{

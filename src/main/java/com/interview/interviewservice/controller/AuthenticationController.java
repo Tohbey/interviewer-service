@@ -8,20 +8,19 @@ import com.interview.interviewservice.dtos.AuthenticationResponse;
 import com.interview.interviewservice.dtos.ForgotPasswordRequest;
 import com.interview.interviewservice.dtos.ResetPasswordRequest;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.AuthenticationService;
 import jakarta.validation.Valid;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.Optional;
 
 
 //  Testing Completed.
 @RestController
 @RequestMapping(AuthenticationController.BASE_URL)
 public class AuthenticationController {
-    public static final String BASE_URL="/api/v1/auth";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"auth"+BaseResource.RELATIVEPATH;
 
     private final AuthenticationService authenticationService;
 
@@ -29,7 +28,7 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/login")
+    @RequestMapping(method = RequestMethod.POST, value = "login")
     public IDataResponse createAuthenticationToken(@RequestBody @Valid AuthenticationRequest authenticationRequest) throws Exception {
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -45,7 +44,7 @@ public class AuthenticationController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/verify")
+    @RequestMapping(method = RequestMethod.PATCH, value = "verify")
     public IDataResponse verifyUser(@RequestParam(value = "email") String email, @RequestParam(value = "token") String token){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -61,7 +60,7 @@ public class AuthenticationController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/change-password")
+    @RequestMapping(method = RequestMethod.PATCH, value = "change-password")
     public IDataResponse changePassword(@RequestBody @Valid ForgotPasswordRequest forgotPasswordRequest) {
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -76,7 +75,7 @@ public class AuthenticationController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/forgot")
+    @RequestMapping(method = RequestMethod.POST, value = "forgot")
     public IDataResponse recover(@RequestParam(value = "email") String email) {
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -91,7 +90,7 @@ public class AuthenticationController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/reset")
+    @RequestMapping(method = RequestMethod.POST, value = "reset")
     public IDataResponse resetPassword(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -108,7 +107,7 @@ public class AuthenticationController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/getUserInfo")
+    @RequestMapping(method = RequestMethod.GET, value = "getUserInfo")
     public IDataResponse CurrentUserInfo() {
         IDataResponse dataResponse = new IDataResponse();
         try {

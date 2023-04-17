@@ -4,6 +4,7 @@ import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.StageDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.StageService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ import java.util.Collections;
 @RequestMapping(StageController.BASE_URL)
 public class StageController {
 
-    public static final String BASE_URL="/api/v1/stage";
+    public static final String BASE_URL="/api/v1/stage/";
 
     private final StageService stageService;
 
@@ -25,7 +26,7 @@ public class StageController {
         this.stageService = stageService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.CREATE)
     public IDataResponse createStage(@RequestBody StageDTO stageDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -41,7 +42,7 @@ public class StageController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{stageId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.UPDATE+BaseResource.RELATIVEPATH+"{stageId}")
     public IDataResponse findStage(@PathVariable("stageId") Long stageId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -56,7 +57,7 @@ public class StageController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateStage(@RequestBody StageDTO stageDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -71,7 +72,7 @@ public class StageController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{stageId}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{stageId}")
     public IDataResponse deleteStage(@PathVariable("stageId") Long stageId){
         IDataResponse dataResponse = new IDataResponse();
         try {

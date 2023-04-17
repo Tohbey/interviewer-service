@@ -5,6 +5,7 @@ import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ import java.util.Collections;
 @RequestMapping(UserController.BASE_URL)
 public class UserController {
 
-    public static final String BASE_URL="/api/v1/user";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"user"+BaseResource.RELATIVEPATH;
 
     private final UserService userService;
 
@@ -24,7 +25,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse<User> createUser(@RequestBody @Valid UserDTO userDTO){
         IDataResponse<User> dataResponse = new IDataResponse<User>();
         try {
@@ -39,7 +40,7 @@ public class UserController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{user}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{user}")
     public IDataResponse<UserDTO> findUser(@PathVariable("user") Long userId){
         IDataResponse<UserDTO> dataResponse = new IDataResponse<UserDTO>();
         try {
@@ -54,7 +55,7 @@ public class UserController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{user}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{user}")
     public IDataResponse deleteUser(@PathVariable("user") Long userId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -69,7 +70,7 @@ public class UserController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateUser(@RequestBody UserDTO userDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {

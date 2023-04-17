@@ -5,6 +5,7 @@ import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.model.Message;
+import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.InterviewService;
 import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.TeamService;
@@ -16,7 +17,7 @@ import java.util.Collections;
 @RequestMapping(TeamController.BASE_URL)
 public class TeamController {
 
-    public static final String BASE_URL="/api/v1/team";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"team"+BaseResource.RELATIVEPATH;
 
     private final TeamService teamService;
 
@@ -30,7 +31,7 @@ public class TeamController {
         this.interviewService = interviewService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createTeam(@RequestBody TeamDTO teamDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -46,7 +47,7 @@ public class TeamController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find/{teamId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{teamId}")
     public IDataResponse<TeamDTO> findTeam(@PathVariable("teamId") Long teamId){
         IDataResponse<TeamDTO> dataResponse = new IDataResponse<TeamDTO>();
         try {
@@ -61,7 +62,7 @@ public class TeamController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{teamId}")
+    @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{teamId}")
     public IDataResponse deleteTeam(@PathVariable("teamId") Long teamId){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -76,7 +77,7 @@ public class TeamController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateTeam(@RequestBody TeamDTO teamDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -91,7 +92,7 @@ public class TeamController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/invites/{teamId}")
+    @RequestMapping(method = RequestMethod.GET, value = "invites/{teamId}")
     public IDataResponse<InvitesDTO> findInvitesByTeam(@PathVariable("teamId") Long teamId){
         IDataResponse<InvitesDTO> dataResponse = new IDataResponse<InvitesDTO>();
         try {
@@ -107,7 +108,7 @@ public class TeamController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/interview/{teamId}")
+    @RequestMapping(method = RequestMethod.GET, value = "interview/{teamId}")
     public IDataResponse getInterviewsByJob(@PathVariable ("teamId") Long teamId){
         IDataResponse dataResponse = new IDataResponse();
         try{

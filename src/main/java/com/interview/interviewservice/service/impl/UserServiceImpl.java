@@ -9,6 +9,7 @@ import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.mapper.mappers.UserMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.*;
+import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -41,10 +42,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final AuthenticationService authenticationService;
+
+
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl .class);
 
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, CompanyRepository companyRepository, RoleRepository roleRepository, RoleMapper roleMapper, TeamRepository teamRepository, TeamMapper teamMapper, TokenRepository tokenRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, CompanyRepository companyRepository, RoleRepository roleRepository, RoleMapper roleMapper, TeamRepository teamRepository, TeamMapper teamMapper, TokenRepository tokenRepository, AuthenticationService authenticationService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.companyRepository = companyRepository;
@@ -53,6 +57,7 @@ public class UserServiceImpl implements UserService {
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
         this.tokenRepository = tokenRepository;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -98,6 +103,8 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = this.userRepository.findById(userId);
         if(user.isPresent()){
             user.get().setFlag(Flag.DISABLED);
+            user.get().setLastModifiedDate(new Date());
+            user.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
             userRepository.save(user.get());
         }else{
             throw new CustomException("User Not found");
@@ -159,6 +166,8 @@ public class UserServiceImpl implements UserService {
         user.setIsNewUser(savedUser.get().getIsNewUser());
         user.setIsActive(savedUser.get().getIsActive());
         user.setFlag(savedUser.get().getFlag());
+        user.setLastModifiedDate(new Date());
+        user.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
 
         Company company = companyRepository.findCompanyByCompanyId(userDTO.getCompanyId());
         Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());

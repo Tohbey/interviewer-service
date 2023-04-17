@@ -3,20 +3,19 @@ package com.interview.interviewservice.service.impl;
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Team;
-import com.interview.interviewservice.entity.User;
-import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
-import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.repository.UserRepository;
+import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.TeamService;
 import com.interview.interviewservice.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,20 +31,23 @@ public class TeamServiceImpl implements TeamService {
 
     private final InvitesService invitesService;
 
-    public TeamServiceImpl(TeamRepository teamRepository, TeamMapper teamMapper, UserRepository userRepository, UserService userService, CompanyRepository companyRepository, InvitesService invitesService) {
+    private final AuthenticationService authenticationService;
+
+    public TeamServiceImpl(TeamRepository teamRepository, TeamMapper teamMapper, UserRepository userRepository, UserService userService, CompanyRepository companyRepository, InvitesService invitesService, AuthenticationService authenticationService) {
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
         this.userRepository = userRepository;
         this.userService = userService;
         this.companyRepository = companyRepository;
         this.invitesService = invitesService;
+        this.authenticationService = authenticationService;
     }
 
 
     @Override
     public Team create(TeamDTO teamDTO) throws CustomException {
         validation(teamDTO);
-        Team team = teamMapper.teamDTOToTeam(teamDTO);
+        Team team = mapper(teamDTO);
         team.setFlag(Flag.ENABLED);
 
         team = teamRepository.save(team);
@@ -83,6 +85,10 @@ public class TeamServiceImpl implements TeamService {
         Optional<Team> team = teamRepository.findById(teamId);
         if(team.isPresent()){
             team.get().setFlag(Flag.DISABLED);
+            team.get().setLastModifiedDate(new Date());
+            team.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+
+            teamRepository.save(team.get());
         }else{
             throw new CustomException("Team Not Found");
         }
@@ -105,7 +111,7 @@ public class TeamServiceImpl implements TeamService {
 
         if(savedTeam.isPresent() && Objects.nonNull(company)){
             validateUpdate(teamDTO, savedTeam.get());
-            Team team = teamMapper.teamDTOToTeam(teamDTO);
+            Team team = mapper(teamDTO);
             team.setCompany(company);
 
             teamRepository.save(team);
@@ -149,5 +155,19 @@ public class TeamServiceImpl implements TeamService {
                 throw new CustomException("Section Already Exist");
             }
         }
+    }
+
+
+    private Team mapper(TeamDTO teamDTO) throws CustomException {
+        Team team = teamMapper.teamDTOToTeam(teamDTO);
+        if(Objects.isNull(team.getId())){
+            team.setCreatedDate(new Date());
+            team.setCreatedBy(authenticationService.getCurrentUser().getFullname());
+        }else{
+            team.setLastModifiedDate(new Date());
+            team.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+        }
+
+        return team;
     }
 }

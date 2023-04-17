@@ -2,17 +2,16 @@ package com.interview.interviewservice.service.impl;
 
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.Company;
+import com.interview.interviewservice.entity.Stage;
 import com.interview.interviewservice.entity.Team;
-import com.interview.interviewservice.mapper.DTOS.CompanyDTO;
-import com.interview.interviewservice.mapper.DTOS.RoleDTO;
-import com.interview.interviewservice.mapper.DTOS.TeamDTO;
-import com.interview.interviewservice.mapper.DTOS.UserDTO;
+import com.interview.interviewservice.mapper.DTOS.*;
 import com.interview.interviewservice.mapper.mappers.CompanyMapper;
 import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.model.RoleEnum;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.TeamRepository;
+import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.CompanyService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,10 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -44,14 +40,18 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final AuthenticationService authenticationService;
+
+
     private static final Logger logger = LoggerFactory.getLogger(CompanyServiceImpl .class);
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, UserService userService, CompanyMapper companyMapper, TeamRepository teamRepository, TeamMapper teamMapper) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, UserService userService, CompanyMapper companyMapper, TeamRepository teamRepository, TeamMapper teamMapper, AuthenticationService authenticationService) {
         this.companyRepository = companyRepository;
         this.userService = userService;
         this.companyMapper = companyMapper;
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -93,6 +93,8 @@ public class CompanyServiceImpl implements CompanyService {
         Optional<Company> company = this.companyRepository.findById(companyId);
         if(company.isPresent()){
             company.get().setFlag(Flag.DISABLED);
+            company.get().setLastModifiedDate(new Date());
+            company.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
             companyRepository.save(company.get());
         }else{
             throw new Exception("Company Not found");
@@ -134,7 +136,7 @@ public class CompanyServiceImpl implements CompanyService {
         Optional<Company> savedCompany = companyRepository.findById(companyDTO.getId());
         if(savedCompany.isPresent()){
             validateUpdate(companyDTO, savedCompany.get());
-            Company company = companyMapper.companyDTOToCompany(companyDTO);
+            Company company = mapper(companyDTO);
 
             companyRepository.save(company);
         }else{
@@ -176,5 +178,15 @@ public class CompanyServiceImpl implements CompanyService {
                 throw new CustomException("Phone Number Already Exist");
             }
         }
+    }
+
+    private Company mapper(CompanyDTO companyDTO) throws CustomException {
+        Company company = companyMapper.companyDTOToCompany(companyDTO);
+        if(Objects.nonNull(company.getId())){
+            company.setLastModifiedDate(new Date());
+            company.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+        }
+
+        return company;
     }
 }

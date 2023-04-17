@@ -12,13 +12,11 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.repository.StageRepository;
+import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.JobService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -33,19 +31,22 @@ public class JobServiceImpl implements JobService {
 
     private final StageMapper  stageMapper;
 
+    private final AuthenticationService authenticationService;
 
-    public JobServiceImpl(JobRepository jobRepository, JobMapper jobMapper, CompanyRepository companyRepository, StageRepository stageRepository, StageMapper stageMapper) {
+
+    public JobServiceImpl(JobRepository jobRepository, JobMapper jobMapper, CompanyRepository companyRepository, StageRepository stageRepository, StageMapper stageMapper, AuthenticationService authenticationService) {
         this.jobRepository = jobRepository;
         this.jobMapper = jobMapper;
         this.companyRepository = companyRepository;
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
+        this.authenticationService = authenticationService;
     }
 
     @Override
     public void create(JobDTO jobDTO) throws CustomException {
         validate(jobDTO);
-        Job job = jobMapper.jobDTOToJob(jobDTO);
+        Job job = mapper(jobDTO);
 
         Company company = companyRepository.findCompanyByCompanyId(jobDTO.getCompanyId());
         job.setCompany(company);
@@ -82,7 +83,7 @@ public class JobServiceImpl implements JobService {
         Optional<Job> savedJob = jobRepository.findById(jobDTO.getId());
         if (savedJob.isPresent()) {
             validateUpdate(jobDTO, savedJob.get());
-            Job job = jobMapper.jobDTOToJob(jobDTO);
+            Job job = mapper(jobDTO);
 
             List<Stage> stages = new ArrayList<>();
             jobDTO.getStages().forEach(stageDTO -> {
@@ -101,6 +102,8 @@ public class JobServiceImpl implements JobService {
         Optional<Job> job = jobRepository.findById(jobId);
         if (job.isPresent()) {
             job.get().setFlag(Flag.DISABLED);
+            job.get().setLastModifiedDate(new Date());
+            job.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
             jobRepository.save(job.get());
         }else{
             throw new CustomException("Job Details not found");
@@ -173,5 +176,18 @@ public class JobServiceImpl implements JobService {
                 }
             }
         });
+    }
+
+    private Job mapper(JobDTO jobDTO) throws CustomException {
+        Job job = jobMapper.jobDTOToJob(jobDTO);
+        if(Objects.isNull(job.getId())){
+            job.setCreatedDate(new Date());
+            job.setCreatedBy(authenticationService.getCurrentUser().getFullname());
+        }else{
+            job.setLastModifiedDate(new Date());
+            job.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+        }
+
+        return job;
     }
 }

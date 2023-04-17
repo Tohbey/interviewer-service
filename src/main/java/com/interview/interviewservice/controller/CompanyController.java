@@ -114,6 +114,7 @@ public class CompanyController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "/users/{companyId}/{flag}")
     public IDataResponse<UserDTO> findUsersByCompanyAndFlag(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<UserDTO> dataResponse = new IDataResponse<UserDTO>();
@@ -129,6 +130,7 @@ public class CompanyController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "/stages/{companyId}/{flag}")
     public IDataResponse<StageDTO> findStagesByCompany(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<StageDTO> dataResponse = new IDataResponse<StageDTO>();

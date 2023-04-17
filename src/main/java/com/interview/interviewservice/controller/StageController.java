@@ -17,7 +17,7 @@ import java.util.Collections;
 @RequestMapping(StageController.BASE_URL)
 public class StageController {
 
-    public static final String BASE_URL="/api/v1/stage/";
+    public static final String BASE_URL= BaseResource.API+BaseResource.RELATIVEPATH+"stage"+BaseResource.RELATIVEPATH;
 
     private final StageService stageService;
 

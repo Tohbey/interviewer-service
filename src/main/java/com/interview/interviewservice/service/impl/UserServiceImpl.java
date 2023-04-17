@@ -154,6 +154,12 @@ public class UserServiceImpl implements UserService {
 
         validateUpdate(userDTO, savedUser.get());
         User user = userMapper.userDTOToUser(userDTO);
+
+        user.setPassword(savedUser.get().getPassword());
+        user.setIsNewUser(savedUser.get().getIsNewUser());
+        user.setIsActive(savedUser.get().getIsActive());
+        user.setFlag(savedUser.get().getFlag());
+
         Company company = companyRepository.findCompanyByCompanyId(userDTO.getCompanyId());
         Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());
         user.setCompany(company);

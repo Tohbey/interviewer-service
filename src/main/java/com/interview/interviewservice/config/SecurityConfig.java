@@ -55,8 +55,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, CompanyController.BASE_URL + "/save").permitAll()
                 .requestMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll()
                 // all other requests need to be authenticated
-                .anyRequest().authenticated().and().
-                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .anyRequest().authenticated().and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

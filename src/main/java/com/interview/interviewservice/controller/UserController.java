@@ -6,10 +6,12 @@ import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.model.Message;
 import com.interview.interviewservice.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
+//  Testing Completed.
 @RestController
 @RequestMapping(UserController.BASE_URL)
 public class UserController {
@@ -23,7 +25,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save")
-    public IDataResponse<User> createUser(@RequestBody UserDTO userDTO){
+    public IDataResponse<User> createUser(@RequestBody @Valid UserDTO userDTO){
         IDataResponse<User> dataResponse = new IDataResponse<User>();
         try {
             userService.create(userDTO);
@@ -66,7 +68,6 @@ public class UserController {
         }
         return dataResponse;
     }
-
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update")
     public IDataResponse updateUser(@RequestBody UserDTO userDTO){

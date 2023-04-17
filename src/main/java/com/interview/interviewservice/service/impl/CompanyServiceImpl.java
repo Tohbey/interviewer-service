@@ -3,7 +3,6 @@ package com.interview.interviewservice.service.impl;
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Team;
-import com.interview.interviewservice.jwt.JwtAuthenticationEntryPoint;
 import com.interview.interviewservice.mapper.DTOS.CompanyDTO;
 import com.interview.interviewservice.mapper.DTOS.RoleDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;

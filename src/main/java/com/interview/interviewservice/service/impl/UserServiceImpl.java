@@ -11,7 +11,12 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.*;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -33,6 +38,12 @@ public class UserServiceImpl implements UserService {
 
     private final TokenRepository tokenRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl .class);
+
+
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, CompanyRepository companyRepository, RoleRepository roleRepository, RoleMapper roleMapper, TeamRepository teamRepository, TeamMapper teamMapper, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -45,10 +56,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void create(UserDTO userDTO) throws CustomException {
         validation(userDTO);
+        String password = RandomStringUtils.randomAlphabetic(10);
+        logger.info("Password: {}",password);
+
+        String encryptedPassword = passwordEncoder.encode(password);
+
         User user = userMapper.userDTOToUser(userDTO);
         user.setFlag(Flag.ENABLED);
+        user.setPassword(encryptedPassword);
+        user.setIsNewUser(true);
 
         Company company = companyRepository.findCompanyByCompanyId(userDTO.getCompanyId());
         Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());
@@ -70,7 +89,8 @@ public class UserServiceImpl implements UserService {
         verifyToken.setUser(savedUser);
         verifyToken.setExpiredAt(expiredAt);
 
-        tokenRepository.save(verifyToken);
+        Token savedToken = tokenRepository.save(verifyToken);
+        userCreationEmail(savedUser, savedToken);
     }
 
     @Override
@@ -210,5 +230,9 @@ public class UserServiceImpl implements UserService {
                 throw new CustomException("Team Does Not Exist");
             }
         }
+    }
+
+    private void userCreationEmail(User user, Token token){
+
     }
 }

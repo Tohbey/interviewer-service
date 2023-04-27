@@ -37,13 +37,20 @@ public class InviteServiceImpl implements InvitesService {
         validation(invitesDTO);
         Invites invite = invitesMapper.inviteDTOToInvite(invitesDTO);
 
-        Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
-        if(team.isPresent()){
-            invite.setTeam(team.get());
-            invite.setFlag(Flag.ENABLED);
+        if(Objects.nonNull(invite.getTeam())){
+            Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
+            if(team.isPresent()){
+                invite.setTeam(team.get());
+                invite.setFlag(Flag.ENABLED);
 
-            invitesRepository.save(invite);
+                invitesRepository.save(invite);
+            }else{
+                throw new CustomException("Team Not found");
+            }
+        }else{
+            throw new CustomException("Team Id cant be empty");
         }
+
     }
 
     @Override

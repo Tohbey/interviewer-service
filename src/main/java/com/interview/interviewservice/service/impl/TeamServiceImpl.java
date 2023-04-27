@@ -3,6 +3,8 @@ package com.interview.interviewservice.service.impl;
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Team;
+import com.interview.interviewservice.entity.User;
+import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.model.Flag;
@@ -45,39 +47,40 @@ public class TeamServiceImpl implements TeamService {
 
 
     @Override
-    public Team create(TeamDTO teamDTO) throws CustomException {
+    public void create(TeamDTO teamDTO) throws CustomException {
         validation(teamDTO);
         Team team = mapper(teamDTO);
         team.setFlag(Flag.ENABLED);
 
         team = teamRepository.save(team);
 
-//        if(teamDTO.getTeamMembers().size() > 0){
-//            Team finalTeam = team;
-//            teamDTO.getTeamMembers().forEach(user -> {
-//                if(Objects.isNull(user.getId())){
-//                    InvitesDTO invitesDTO = new InvitesDTO(user.getSurname(), user.getOtherNames(), user.getEmail(), finalTeam.getId());
-//                    try {
-//                        this.invitesService.create(invitesDTO);
-//                    } catch (CustomException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }else{
-//                    Optional<User> currentUser = userRepository.findById(user.getId());
-//                    if(currentUser.isPresent()){
-//                        currentUser.get().setTeam(finalTeam);
-//                        UserDTO userDTO = userService.mapper(currentUser.get());
-//                        try {
-//                            this.userService.update(userDTO);
-//                        } catch (CustomException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                }
-//            });
-//        }
+        if(teamDTO.getInvites().size() > 0){
+            Team finalTeam = team;
+            teamDTO.getInvites().forEach(invite -> {
+                InvitesDTO invitesDTO = new InvitesDTO(invite.getSurname(), invite.getOthernames(), invite.getEmail(), finalTeam.getId());
+                try {
+                    invitesService.create(invitesDTO);
+                } catch (CustomException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
 
-        return team;
+
+        if(teamDTO.getTeamMembers().size() > 0){
+            Team finalTeam = team;
+            teamDTO.getTeamMembers().forEach(teamMember -> {
+                Optional<User> user = userRepository.findById(teamMember.getId());
+                if(user.isPresent()){
+                    user.get().setTeam(finalTeam);
+                    try {
+                        userService.update(userService.mapper(user.get()));
+                    } catch (CustomException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
     }
 
     @Override

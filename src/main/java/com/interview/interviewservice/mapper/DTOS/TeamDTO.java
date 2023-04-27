@@ -12,17 +12,6 @@ public class TeamDTO extends BaseDTO {
     private String color;
     private String section;
     private String companyId;
-//    private List<Userdto> teamMembers;
-//
-//    @Data
-//    public static class Userdto{
-//        private String surname;
-//        private String otherNames;
-//        private String fullname;
-//        private String address;
-//        private String phoneNumber;
-//        private String email;
-//        private Long id;
-//        private boolean isUser;
-//    }
+    private List<UserDTO> teamMembers;
+    private List<InvitesDTO> invites;
 }

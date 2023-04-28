@@ -21,6 +21,4 @@ public interface AuthenticationService {
     Optional<User> reset(String email, String token) throws Exception;
 
     void resetPassword(ResetPasswordRequest resetPasswordRequest) throws Exception;
-
-    UserDTO getCurrentUser() throws CustomException;
 }

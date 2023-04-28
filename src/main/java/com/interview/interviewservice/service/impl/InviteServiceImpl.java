@@ -13,6 +13,7 @@ import com.interview.interviewservice.repository.InvitesRepository;
 import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.InvitesService;
+import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -29,16 +30,16 @@ public class InviteServiceImpl implements InvitesService {
 
     private final TeamRepository teamRepository;
 
-    private final AuthenticationService authenticationService;
+    private final UserContextService userContextService;
 
-    private final UserService userService;
-
-    public InviteServiceImpl(InvitesRepository invitesRepository, InvitesMapper invitesMapper, TeamRepository teamRepository, AuthenticationService authenticationService, com.interview.interviewservice.service.UserService userService) {
+    public InviteServiceImpl(InvitesRepository invitesRepository,
+                             InvitesMapper invitesMapper,
+                             TeamRepository teamRepository,
+                             UserContextService userContextService) {
         this.invitesRepository = invitesRepository;
         this.invitesMapper = invitesMapper;
         this.teamRepository = teamRepository;
-        this.authenticationService = authenticationService;
-        this.userService = userService;
+        this.userContextService = userContextService;
     }
 
     @Override
@@ -79,7 +80,7 @@ public class InviteServiceImpl implements InvitesService {
             validateUpdate(invitesDTO, savedInvite.get());
             Invites invite = invitesMapper.inviteDTOToInvite(invitesDTO);
             invite.setLastModifiedDate(new Date());
-            invite.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            invite.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
 
             invitesRepository.save(invite);
         }else{

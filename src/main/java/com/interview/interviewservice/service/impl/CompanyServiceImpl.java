@@ -13,6 +13,7 @@ import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.CompanyService;
+import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -40,18 +41,23 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final AuthenticationService authenticationService;
+    private final UserContextService userContextService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(CompanyServiceImpl .class);
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, UserService userService, CompanyMapper companyMapper, TeamRepository teamRepository, TeamMapper teamMapper, AuthenticationService authenticationService) {
+    public CompanyServiceImpl(CompanyRepository companyRepository,
+                              UserService userService,
+                              CompanyMapper companyMapper,
+                              TeamRepository teamRepository,
+                              TeamMapper teamMapper,
+                              UserContextService userContextService) {
         this.companyRepository = companyRepository;
         this.userService = userService;
         this.companyMapper = companyMapper;
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
-        this.authenticationService = authenticationService;
+        this.userContextService = userContextService;
     }
 
     @Override
@@ -94,7 +100,7 @@ public class CompanyServiceImpl implements CompanyService {
         if(company.isPresent()){
             company.get().setFlag(Flag.DISABLED);
             company.get().setLastModifiedDate(new Date());
-            company.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            company.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
             companyRepository.save(company.get());
         }else{
             throw new Exception("Company Not found");
@@ -184,7 +190,7 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyMapper.companyDTOToCompany(companyDTO);
         if(Objects.nonNull(company.getId())){
             company.setLastModifiedDate(new Date());
-            company.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            company.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
         }
 
         return company;

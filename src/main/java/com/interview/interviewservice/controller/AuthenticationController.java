@@ -10,6 +10,7 @@ import com.interview.interviewservice.dtos.ResetPasswordRequest;
 import com.interview.interviewservice.model.Message;
 import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.AuthenticationService;
+import com.interview.interviewservice.service.UserContextService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,11 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    public AuthenticationController(AuthenticationService authenticationService) {
+    private final UserContextService userContextService;
+
+    public AuthenticationController(AuthenticationService authenticationService, UserContextService userContextService) {
         this.authenticationService = authenticationService;
+        this.userContextService = userContextService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "login")
@@ -111,7 +115,7 @@ public class AuthenticationController {
     public IDataResponse CurrentUserInfo() {
         IDataResponse dataResponse = new IDataResponse();
         try {
-            dataResponse.setData(Collections.singletonList(authenticationService.getCurrentUser()));
+            dataResponse.setData(Collections.singletonList(userContextService.getCurrentUserDTO()));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Current User Retrieved Successfully","Current User Info", Message.Severity.INFO));
         } catch (Exception e) {

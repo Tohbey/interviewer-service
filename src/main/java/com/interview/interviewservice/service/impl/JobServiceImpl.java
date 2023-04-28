@@ -14,6 +14,7 @@ import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.repository.StageRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.JobService;
+import com.interview.interviewservice.service.UserContextService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,16 +32,21 @@ public class JobServiceImpl implements JobService {
 
     private final StageMapper  stageMapper;
 
-    private final AuthenticationService authenticationService;
+    private final UserContextService userContextService;
 
 
-    public JobServiceImpl(JobRepository jobRepository, JobMapper jobMapper, CompanyRepository companyRepository, StageRepository stageRepository, StageMapper stageMapper, AuthenticationService authenticationService) {
+    public JobServiceImpl(JobRepository jobRepository,
+                          JobMapper jobMapper,
+                          CompanyRepository companyRepository,
+                          StageRepository stageRepository,
+                          StageMapper stageMapper,
+                          UserContextService userContextService) {
         this.jobRepository = jobRepository;
         this.jobMapper = jobMapper;
         this.companyRepository = companyRepository;
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
-        this.authenticationService = authenticationService;
+        this.userContextService = userContextService;
     }
 
     @Override
@@ -103,7 +109,7 @@ public class JobServiceImpl implements JobService {
         if (job.isPresent()) {
             job.get().setFlag(Flag.DISABLED);
             job.get().setLastModifiedDate(new Date());
-            job.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            job.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
             jobRepository.save(job.get());
         }else{
             throw new CustomException("Job Details not found");
@@ -182,10 +188,10 @@ public class JobServiceImpl implements JobService {
         Job job = jobMapper.jobDTOToJob(jobDTO);
         if(Objects.isNull(job.getId())){
             job.setCreatedDate(new Date());
-            job.setCreatedBy(authenticationService.getCurrentUser().getFullname());
+            job.setCreatedBy(userContextService.getCurrentUserDTO().getFullname());
         }else{
             job.setLastModifiedDate(new Date());
-            job.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            job.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
         }
 
         return job;

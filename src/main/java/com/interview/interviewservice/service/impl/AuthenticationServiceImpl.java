@@ -10,11 +10,10 @@ import com.interview.interviewservice.dtos.ResetPasswordRequest;
 import com.interview.interviewservice.entity.Token;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.jwt.JwtUtils;
-import com.interview.interviewservice.mapper.DTOS.UserDTO;
-import com.interview.interviewservice.mapper.mappers.UserMapper;
 import com.interview.interviewservice.repository.TokenRepository;
 import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.AuthenticationService;
+import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +24,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,19 +52,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenRepository tokenRepository;
 
-
     private final UserService userService;
+
+    private final UserContextService userContextService;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl .class);
 
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager,
                                      UserRepository userRepository,
                                      TokenRepository tokenRepository,
-                                     UserService userService) {
+                                     UserService userService, UserContextService userContextService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.userService = userService;
         this.tokenRepository = tokenRepository;
+        this.userContextService = userContextService;
     }
 
 
@@ -131,7 +131,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
-        Optional<User> user = getCurrent();
+        Optional<User> user = userContextService.getCurrentUser();
 
         if (!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())) {
             throw new Exception("Invalid Old Password");
@@ -209,28 +209,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }).orElseGet(() -> {
             return userRepository.save(user.get());
         });
-    }
-
-    @Override
-    public UserDTO getCurrentUser() throws CustomException {
-        CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = userDetail.getUsername();
-        Optional<User> user = userRepository.findUserByEmail(email);
-        if (user.isEmpty()) {
-            throw new CustomException("User Not Found. for EMAIL value " + email);
-        }
-
-        return userService.mapper(user.get());
-    }
-
-    private Optional<User> getCurrent() throws CustomException {
-        CustomDetail userDetail = (CustomDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = userDetail.getUsername();
-        Optional<User> user = userRepository.findUserByEmail(email);
-        if (user.isEmpty()) {
-            throw new CustomException("User Not Found. for EMAIL value " + email);
-        }
-
-        return user;
     }
 }

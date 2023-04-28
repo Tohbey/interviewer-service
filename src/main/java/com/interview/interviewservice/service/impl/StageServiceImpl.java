@@ -10,6 +10,7 @@ import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.StageRepository;
 import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.StageService;
+import com.interview.interviewservice.service.UserContextService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,13 +24,16 @@ public class StageServiceImpl implements StageService {
 
     private final CompanyRepository companyRepository;
 
-    private final AuthenticationService authenticationService;
+    private final UserContextService userContextService;
 
-    public StageServiceImpl(StageRepository stageRepository, StageMapper stageMapper, CompanyRepository companyRepository, AuthenticationService authenticationService) {
+    public StageServiceImpl(StageRepository stageRepository,
+                            StageMapper stageMapper,
+                            CompanyRepository companyRepository,
+                            UserContextService userContextService) {
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
         this.companyRepository = companyRepository;
-        this.authenticationService = authenticationService;
+        this.userContextService = userContextService;
     }
 
 
@@ -79,7 +83,7 @@ public class StageServiceImpl implements StageService {
         if(stage.isPresent()){
             stage.get().setFlag(Flag.DISABLED);
             stage.get().setLastModifiedDate(new Date());
-            stage.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            stage.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
 
             stageRepository.save(stage.get());
         }else{
@@ -140,10 +144,10 @@ public class StageServiceImpl implements StageService {
         Stage stage = stageMapper.stageDTOToStage(stageDTO);
         if(Objects.isNull(stage.getId())){
             stage.setCreatedDate(new Date());
-            stage.setCreatedBy(authenticationService.getCurrentUser().getFullname());
+            stage.setCreatedBy(userContextService.getCurrentUserDTO().getFullname());
         }else{
             stage.setLastModifiedDate(new Date());
-            stage.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            stage.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
         }
 
         return stage;

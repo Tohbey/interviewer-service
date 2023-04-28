@@ -14,10 +14,7 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.repository.UserRepository;
-import com.interview.interviewservice.service.AuthenticationService;
-import com.interview.interviewservice.service.InvitesService;
-import com.interview.interviewservice.service.TeamService;
-import com.interview.interviewservice.service.UserService;
+import com.interview.interviewservice.service.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -37,16 +34,22 @@ public class TeamServiceImpl implements TeamService {
 
     private final InvitesService invitesService;
 
-    private final AuthenticationService authenticationService;
+    private final UserContextService userContextService;
 
-    public TeamServiceImpl(TeamRepository teamRepository, TeamMapper teamMapper, UserRepository userRepository, UserService userService, CompanyRepository companyRepository, InvitesService invitesService, AuthenticationService authenticationService) {
+    public TeamServiceImpl(TeamRepository teamRepository,
+                           TeamMapper teamMapper,
+                           UserRepository userRepository,
+                           UserService userService,
+                           CompanyRepository companyRepository,
+                           InvitesService invitesService,
+                           UserContextService userContextService) {
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
         this.userRepository = userRepository;
         this.userService = userService;
         this.companyRepository = companyRepository;
         this.invitesService = invitesService;
-        this.authenticationService = authenticationService;
+        this.userContextService = userContextService;
     }
 
 
@@ -93,7 +96,7 @@ public class TeamServiceImpl implements TeamService {
         if(team.isPresent()){
             team.get().setFlag(Flag.DISABLED);
             team.get().setLastModifiedDate(new Date());
-            team.get().setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            team.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
 
             teamRepository.save(team.get());
         }else{
@@ -203,10 +206,10 @@ public class TeamServiceImpl implements TeamService {
         Team team = teamMapper.teamDTOToTeam(teamDTO);
         if(Objects.isNull(team.getId())){
             team.setCreatedDate(new Date());
-            team.setCreatedBy(authenticationService.getCurrentUser().getFullname());
+            team.setCreatedBy(userContextService.getCurrentUserDTO().getFullname());
         }else{
             team.setLastModifiedDate(new Date());
-            team.setLastModifiedBy(authenticationService.getCurrentUser().getFullname());
+            team.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
         }
 
         return team;

@@ -52,12 +52,12 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/login").permitAll()
-                .requestMatchers(HttpMethod.PATCH, AuthenticationController.BASE_URL + "/verify").permitAll()
-                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset-password").permitAll()
-                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/forgot").permitAll()
-                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "/reset").permitAll()
-                .requestMatchers(HttpMethod.POST, CompanyController.BASE_URL + "/save").permitAll()
+                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "login").permitAll()
+                .requestMatchers(HttpMethod.PATCH, AuthenticationController.BASE_URL + "verify").permitAll()
+                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "reset-password").permitAll()
+                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "forgot").permitAll()
+                .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "reset").permitAll()
+                .requestMatchers(HttpMethod.POST, CompanyController.BASE_URL + "save").permitAll()
                 .requestMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll()
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and()

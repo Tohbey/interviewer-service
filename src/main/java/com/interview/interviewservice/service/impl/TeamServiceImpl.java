@@ -1,11 +1,14 @@
 package com.interview.interviewservice.service.impl;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.dtos.TeamMemberAndInvite;
 import com.interview.interviewservice.entity.Company;
+import com.interview.interviewservice.entity.Invites;
 import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
+import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
@@ -15,6 +18,7 @@ import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.TeamService;
 import com.interview.interviewservice.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -122,6 +126,40 @@ public class TeamServiceImpl implements TeamService {
             throw new CustomException("Team detail not found");
         }
 
+    }
+
+    @Override
+    @Transactional
+    public void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception {
+        TeamDTO teamDTO = find(teamId);
+
+        if(Objects.nonNull(teamDTO)){
+            if(teamMemberAndInvite.getInvites().size() > 0){
+                teamMemberAndInvite.getInvites().forEach(invite -> {
+                    try {
+                        InvitesDTO inviteDTO = invitesService.find(invite);
+                        inviteDTO.setTeamId(teamId);
+                        invitesService.update(inviteDTO);
+                    } catch (CustomException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+
+            if(teamMemberAndInvite.getUserIds().size() > 0){
+                teamMemberAndInvite.getUserIds().forEach(userId  -> {
+                    try {
+                        UserDTO userDTO = userService.find(userId);
+                        userDTO.setTeamDTO(teamDTO);
+                        userService.update(userDTO);
+                    } catch (CustomException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                });
+
+            }
+        }
     }
 
     private void validation(TeamDTO teamDTO) throws CustomException{

@@ -2,7 +2,7 @@ package com.interview.interviewservice.controller;
 
 import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
-import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
+import com.interview.interviewservice.dtos.TeamMemberAndInvite;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.model.Message;
 import com.interview.interviewservice.resource.BaseResource;
@@ -92,11 +92,11 @@ public class TeamController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "invites/{teamId}")
-    public IDataResponse<InvitesDTO> findInvitesByTeam(@PathVariable("teamId") Long teamId){
-        IDataResponse<InvitesDTO> dataResponse = new IDataResponse<InvitesDTO>();
+    @RequestMapping(method = RequestMethod.GET, value = "add/team-members/{teamId}")
+    public IDataResponse addTeamMembersAndInvitesByTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamMemberAndInvite teamMemberAndInvite){
+        IDataResponse dataResponse = new IDataResponse();
         try {
-            dataResponse.setData(invitesService.findInvitesByTeam(teamId));
+            teamService.addTeamMembersAndInvitesByTeam(teamId, teamMemberAndInvite);
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Invites Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
         }catch (Exception e){
@@ -109,7 +109,7 @@ public class TeamController {
 
 
     @RequestMapping(method = RequestMethod.GET, value = "interview/{teamId}")
-    public IDataResponse getInterviewsByJob(@PathVariable ("teamId") Long teamId){
+    public IDataResponse getInterviewsByTeam(@PathVariable ("teamId") Long teamId){
         IDataResponse dataResponse = new IDataResponse();
         try{
             dataResponse.setData(interviewService.findInterviewsByTeam(teamId));

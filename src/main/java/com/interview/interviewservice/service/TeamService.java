@@ -1,7 +1,9 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.dtos.TeamMemberAndInvite;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
+import jakarta.transaction.Transactional;
 
 public interface TeamService {
 
@@ -12,4 +14,6 @@ public interface TeamService {
     TeamDTO find(Long teamId) throws CustomException;
 
     void update(TeamDTO teamDTO) throws CustomException;
+
+    void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception;
 }

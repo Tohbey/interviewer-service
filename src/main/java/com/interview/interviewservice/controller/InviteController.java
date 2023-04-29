@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
+//  Testing Completed.
 @RestController
 @RequestMapping(InviteController.BASE_URL)
 public class InviteController {
@@ -53,7 +54,6 @@ public class InviteController {
         }
         return dataResponse;
     }
-
 
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{inviteId}")
     public IDataResponse deleteInvite(@PathVariable("inviteId") Long inviteId){

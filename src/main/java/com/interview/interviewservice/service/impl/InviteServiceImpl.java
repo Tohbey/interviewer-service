@@ -45,27 +45,30 @@ public class InviteServiceImpl implements InvitesService {
     @Override
     public void create(InvitesDTO invitesDTO) throws CustomException {
         validation(invitesDTO);
-        Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
         Invites invite = invitesMapper.inviteDTOToInvite(invitesDTO);
+
+        if(Objects.nonNull(invitesDTO.getTeamId())){
+            Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
+            if(team.isPresent()){
+                invite.setTeam(team.get());
+            }else{
+                throw new CustomException("Team Not found");
+            }
+        }
         invite.setCreatedDate(new Date());
         invite.setCreatedBy(userContextService.getCurrentUserDTO().getFullname());
+        invite.setFlag(Flag.ENABLED);
 
-        if(team.isPresent()){
-            invite.setTeam(team.get());
-            invite.setTeam(team.get());
-            invite.setFlag(Flag.ENABLED);
-
-            invitesRepository.save(invite);
-        }else{
-            throw new CustomException("Team Not found");
-        }
+        invitesRepository.save(invite);
     }
 
     @Override
     public InvitesDTO find(Long inviteId) throws CustomException {
         Optional<Invites> invite = invitesRepository.findById(inviteId);
         if(invite.isPresent()){
-            return invitesMapper.inviteToInviteDTO(invite.get());
+            InvitesDTO invitesDTO = invitesMapper.inviteToInviteDTO(invite.get());
+            invitesDTO.setFlag(invite.get().getFlag());
+            return invitesDTO;
         }else{
             throw new CustomException("Invite Not found");
         }
@@ -78,6 +81,11 @@ public class InviteServiceImpl implements InvitesService {
             validateUpdate(invitesDTO, savedInvite.get());
             Invites invite = invitesMapper.inviteDTOToInvite(invitesDTO);
             invite.setLastModifiedDate(new Date());
+            if(Objects.nonNull(invitesDTO.getTeamId())){
+                Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
+                team.ifPresent(invite::setTeam);
+            }
+
             invite.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
 
             invitesRepository.save(invite);
@@ -113,10 +121,6 @@ public class InviteServiceImpl implements InvitesService {
     }
 
     private void validation(InvitesDTO invitesDTO) throws CustomException {
-        if(Objects.isNull(invitesDTO.getTeamId())){
-            throw new CustomException("Team cant be empty");
-        }
-
         if(invitesRepository.existsByEmail(invitesDTO.getEmail())){
             throw new CustomException("Email Already Exist");
         }
@@ -141,10 +145,12 @@ public class InviteServiceImpl implements InvitesService {
 
     private void validateUpdate(InvitesDTO invitesDTO, Invites savedInvite) throws CustomException {
 
-        if(!savedInvite.getTeam().getId().equals(invitesDTO.getTeamId())){
-            if(Objects.nonNull(invitesDTO.getTeamId())){
-                if(teamRepository.findById(invitesDTO.getTeamId()).isEmpty()){
-                    throw new CustomException("Team info not found");
+        if(Objects.nonNull(savedInvite.getTeam()) && Objects.nonNull(invitesDTO.getTeamId())){
+            if(!savedInvite.getTeam().getId().equals(invitesDTO.getTeamId())){
+                if(Objects.nonNull(invitesDTO.getTeamId())){
+                    if(teamRepository.findById(invitesDTO.getTeamId()).isEmpty()){
+                        throw new CustomException("Team info not found");
+                    }
                 }
             }
         }

@@ -173,11 +173,7 @@ public class TeamServiceImpl implements TeamService {
                         InvitesDTO inviteDTO = invitesService.find(invite);
                         inviteDTO.setTeamId(teamId);
                         inviteDTO.setLastModifiedDate(new Date());
-                        try {
-                            inviteDTO.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
-                        } catch (CustomException e) {
-                            throw new RuntimeException(e);
-                        }
+                        inviteDTO.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
                         invitesService.update(inviteDTO);
                     } catch (CustomException e) {
                         throw new RuntimeException(e);
@@ -191,11 +187,7 @@ public class TeamServiceImpl implements TeamService {
                         UserDTO userDTO = userService.find(userId);
                         userDTO.getTeamDTO().add(teamDTO);
                         userDTO.setLastModifiedDate(new Date());
-                        try {
-                            userDTO.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
-                        } catch (CustomException e) {
-                            throw new RuntimeException(e);
-                        }
+                        userDTO.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
                         userService.update(userDTO);
                     } catch (CustomException e) {
                         throw new RuntimeException(e);

@@ -80,13 +80,14 @@ public class TeamController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateTeam(@RequestBody TeamDTO teamDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
             teamService.update(teamDTO);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Team Successfully Deleted","Deleted", Message.Severity.SUCCESS));
+            dataResponse.addMessage(new GlobalMessage("Team Successfully Updated","Updated", Message.Severity.SUCCESS));
         }catch (Exception e){
             e.printStackTrace();
             dataResponse.setValid(false);
@@ -95,13 +96,14 @@ public class TeamController {
         return dataResponse;
     }
 
+
     @RequestMapping(method = RequestMethod.POST, value = "add/team-members/{teamId}")
     public IDataResponse addTeamMembersAndInvitesByTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamMemberAndInvite teamMemberAndInvite){
         IDataResponse dataResponse = new IDataResponse();
         try {
             teamService.addTeamMembersAndInvitesByTeam(teamId, teamMemberAndInvite);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Invites Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
+            dataResponse.addMessage(new GlobalMessage("Team Successfully Updated","Updated", Message.Severity.SUCCESS));
         }catch (Exception e){
             e.printStackTrace();
             dataResponse.setValid(false);

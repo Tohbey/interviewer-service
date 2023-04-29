@@ -64,6 +64,7 @@ public class TeamController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{teamId}")
     public IDataResponse deleteTeam(@PathVariable("teamId") Long teamId){
         IDataResponse dataResponse = new IDataResponse();

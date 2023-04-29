@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -99,12 +100,30 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    @Transactional
     public void delete(long teamId) throws CustomException {
         Optional<Team> team = teamRepository.findById(teamId);
         if(team.isPresent()){
             team.get().setFlag(Flag.DISABLED);
             team.get().setLastModifiedDate(new Date());
             team.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
+
+            List<Invites> invites = invitesRepository.findAllByTeam(team.get());
+            if(invites.size() > 0) {
+                invites.forEach(invite ->{
+                    invite.setTeam(null);
+                    invitesRepository.save(invite);
+                });
+            }
+
+            List<User> users = userRepository.findUserByTeamsContains(team.get());
+            if(users.size() > 0) {
+                users.forEach(user -> {
+                    user.getTeams().remove(team.get());
+
+                    userRepository.save(user);
+                });
+            }
 
             teamRepository.save(team.get());
         }else{

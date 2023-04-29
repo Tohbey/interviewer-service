@@ -48,7 +48,15 @@ public class UserServiceImpl implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl .class);
 
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, CompanyRepository companyRepository, RoleRepository roleRepository, RoleMapper roleMapper, TeamRepository teamRepository, TeamMapper teamMapper, TokenRepository tokenRepository, UserContextService userContextService) {
+    public UserServiceImpl(UserRepository userRepository,
+                           UserMapper userMapper,
+                           CompanyRepository companyRepository,
+                           RoleRepository roleRepository,
+                           RoleMapper roleMapper,
+                           TeamRepository teamRepository,
+                           TeamMapper teamMapper,
+                           TokenRepository tokenRepository,
+                           UserContextService userContextService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.companyRepository = companyRepository;
@@ -127,8 +135,13 @@ public class UserServiceImpl implements UserService {
         userDTO.setCompanyId(user.getCompany().getCompanyId());
         userDTO.setRole(roleMapper.roleToRoleDTO(user.getRole()));
         userDTO.setFullname(user.getUserFullName());
-        TeamDTO teamDTO = teamMapper.teamToTeamDTO(user.getTeam());
-        userDTO.setTeamDTO(teamDTO);
+        Set<TeamDTO> teamDTOs = new HashSet<TeamDTO>();
+        if(user.getTeams().size() > 0){
+            user.getTeams().forEach(team -> {
+                teamDTOs.add(teamMapper.teamToTeamDTO(team));
+            });
+        }
+        userDTO.setTeamDTO(teamDTOs);
 
         return userDTO;
     }
@@ -175,11 +188,25 @@ public class UserServiceImpl implements UserService {
         role.ifPresent(user::setRole);
 
         if(Objects.nonNull(userDTO.getTeamDTO())){
-            Optional<Team> team = teamRepository.findById(userDTO.getTeamDTO().getId());
-            team.ifPresent(user::setTeam);
+            userDTO.getTeamDTO().forEach(teamDTO -> {
+                Optional<Team> team = teamRepository.findById(teamDTO.getId());
+                team.ifPresent(value -> user.getTeams().add(value));
+            });
         }
 
         userRepository.save(user);
+    }
+
+    @Override
+    public List<UserDTO> findUsersByTeam(Team team) {
+        List<UserDTO> userDTOS = new ArrayList<>();
+
+        List<User> users = userRepository.findUserByTeamsContains(team);
+        users.forEach(user -> {
+            userDTOS.add(mapper(user));
+        });
+
+        return userDTOS;
     }
 
     private void validateUpdate(UserDTO userDTO, User savedUser) throws CustomException {
@@ -211,12 +238,17 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        if(Objects.nonNull(userDTO.getTeamDTO()) && Objects.nonNull(savedUser.getTeam())){
-            if(!savedUser.getTeam().getName()
-                    .equalsIgnoreCase(userDTO.getTeamDTO().getName())){
-                if (!teamRepository.existsByNameAndCompany(userDTO.getTeamDTO().getName(), company)){
-                    throw new CustomException("Team Does Not Exist");
-                }
+        if(Objects.nonNull(userDTO.getTeamDTO()) && Objects.nonNull(savedUser.getTeams())){
+            if(savedUser.getTeams().size() != userDTO.getTeamDTO().size()){
+                userDTO.getTeamDTO().forEach(teamDTO -> {
+                    if (!teamRepository.existsByNameAndCompany(teamDTO.getName(), company)){
+                        try {
+                            throw new CustomException("Team Does Not Exist");
+                        } catch (CustomException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
             }
         }
     }
@@ -238,12 +270,6 @@ public class UserServiceImpl implements UserService {
 
         if(roleRepository.findById(user.getRole().getId()).isEmpty()){
             throw new CustomException("Role Does Not Exist");
-        }
-
-        if(Objects.nonNull(user.getTeamDTO())){
-            if (!teamRepository.existsByNameAndCompany(user.getTeamDTO().getName(), company)){
-                throw new CustomException("Team Does Not Exist");
-            }
         }
     }
 

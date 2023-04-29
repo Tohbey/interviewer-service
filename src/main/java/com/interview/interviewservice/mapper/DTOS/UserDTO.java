@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,7 +46,7 @@ public class UserDTO extends BaseDTO {
 
     private RoleDTO role;
 
-    private TeamDTO teamDTO;
+    private Set<TeamDTO> teamDTO = new HashSet<TeamDTO>();
 
     private Boolean isActive;
 }

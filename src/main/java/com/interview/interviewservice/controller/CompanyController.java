@@ -100,6 +100,7 @@ public class CompanyController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "teams/{companyId}")
     public IDataResponse<TeamDTO> findTeamsByCompany(@PathVariable("companyId") Long companyId){
         IDataResponse<TeamDTO> dataResponse = new IDataResponse<TeamDTO>();

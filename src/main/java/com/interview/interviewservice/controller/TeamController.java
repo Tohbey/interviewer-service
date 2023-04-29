@@ -31,6 +31,7 @@ public class TeamController {
         this.interviewService = interviewService;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createTeam(@RequestBody TeamDTO teamDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -47,6 +48,7 @@ public class TeamController {
     }
 
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{teamId}")
     public IDataResponse<TeamDTO> findTeam(@PathVariable("teamId") Long teamId){
         IDataResponse<TeamDTO> dataResponse = new IDataResponse<TeamDTO>();
@@ -92,11 +94,26 @@ public class TeamController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "add/team-members/{teamId}")
+    @RequestMapping(method = RequestMethod.POST, value = "add/team-members/{teamId}")
     public IDataResponse addTeamMembersAndInvitesByTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamMemberAndInvite teamMemberAndInvite){
         IDataResponse dataResponse = new IDataResponse();
         try {
             teamService.addTeamMembersAndInvitesByTeam(teamId, teamMemberAndInvite);
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("Invites Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
+        }catch (Exception e){
+            e.printStackTrace();
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "remove/team-members/{teamId}")
+    public IDataResponse removeTeamMembersAndInvitesByTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamMemberAndInvite teamMemberAndInvite){
+        IDataResponse dataResponse = new IDataResponse();
+        try {
+            teamService.removeTeamMembersAndInvitesByTeam(teamId, teamMemberAndInvite);
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Invites Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
         }catch (Exception e){

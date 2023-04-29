@@ -13,7 +13,9 @@ import com.interview.interviewservice.service.UserContextService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserContextServiceImpl implements UserContextService {
@@ -53,9 +55,13 @@ public class UserContextServiceImpl implements UserContextService {
         userDTO.setCompanyId(user.getCompany().getCompanyId());
         userDTO.setRole(roleMapper.roleToRoleDTO(user.getRole()));
         userDTO.setFullname(user.getUserFullName());
-        TeamDTO teamDTO = teamMapper.teamToTeamDTO(user.getTeam());
-        userDTO.setTeamDTO(teamDTO);
-
+        Set<TeamDTO> teamDTOs = new HashSet<TeamDTO>();
+        if(user.getTeams().size() > 0){
+            user.getTeams().forEach(team -> {
+                teamDTOs.add(teamMapper.teamToTeamDTO(team));
+            });
+        }
+        userDTO.setTeamDTO(teamDTOs);
         return userDTO;
     }
 }

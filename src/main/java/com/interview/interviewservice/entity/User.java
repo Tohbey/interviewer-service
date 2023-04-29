@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -22,9 +24,11 @@ public class User extends FlagableAuditableEntity {
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     private Company company;
 
-    @JoinColumn(name = "team", referencedColumnName = "id")
-    @ManyToOne(optional = true, fetch = FetchType.EAGER)
-    private Team team;
+//    @JoinColumn(name = "team", referencedColumnName = "id")
+//    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+//    private Team team;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Team> teams = new HashSet<Team>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastAccessedDate;

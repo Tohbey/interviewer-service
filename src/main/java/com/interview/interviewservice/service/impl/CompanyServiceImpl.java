@@ -2,7 +2,6 @@ package com.interview.interviewservice.service.impl;
 
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.Company;
-import com.interview.interviewservice.entity.Stage;
 import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.mapper.DTOS.*;
 import com.interview.interviewservice.mapper.mappers.CompanyMapper;
@@ -11,8 +10,8 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.model.RoleEnum;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.TeamRepository;
-import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.CompanyService;
+import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,6 +42,8 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final UserContextService userContextService;
 
+    private final InvitesService invitesService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(CompanyServiceImpl .class);
 
@@ -51,13 +52,14 @@ public class CompanyServiceImpl implements CompanyService {
                               CompanyMapper companyMapper,
                               TeamRepository teamRepository,
                               TeamMapper teamMapper,
-                              UserContextService userContextService) {
+                              UserContextService userContextService, InvitesService invitesService) {
         this.companyRepository = companyRepository;
         this.userService = userService;
         this.companyMapper = companyMapper;
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
         this.userContextService = userContextService;
+        this.invitesService = invitesService;
     }
 
     @Override
@@ -127,13 +129,14 @@ public class CompanyServiceImpl implements CompanyService {
             teams.forEach(team -> {
                 TeamDTO teamDTO = teamMapper.teamToTeamDTO(team);
                 teamDTO.setCompanyId(company.get().getCompanyId());
-
+                teamDTO.setInvites(invitesService.findInvitesByTeam(team));
+                teamDTO.setTeamMembers(userService.findUsersByTeam(team));
                 teamDTOS.add(teamDTO);
             });
 
             return teamDTOS;
         }else{
-            throw new CustomException("Company Not found");
+            throw new CustomException("Company Info Not found");
         }
     }
 

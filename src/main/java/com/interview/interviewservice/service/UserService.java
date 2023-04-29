@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.model.Flag;
@@ -20,4 +21,6 @@ public interface UserService {
     List<UserDTO> findUsersBy(Long companyId, Flag flag) throws CustomException;
 
     UserDTO mapper(User user);
+
+    List<UserDTO> findUsersByTeam(Team team);
 }

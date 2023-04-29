@@ -12,6 +12,7 @@ import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
+import com.interview.interviewservice.repository.InvitesRepository;
 import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.*;
@@ -30,6 +31,8 @@ public class TeamServiceImpl implements TeamService {
     private final UserRepository userRepository;
     private final UserService userService;
 
+    private final InvitesRepository invitesRepository;
+
     private final CompanyRepository companyRepository;
 
     private final InvitesService invitesService;
@@ -40,13 +43,14 @@ public class TeamServiceImpl implements TeamService {
                            TeamMapper teamMapper,
                            UserRepository userRepository,
                            UserService userService,
-                           CompanyRepository companyRepository,
+                           InvitesRepository invitesRepository, CompanyRepository companyRepository,
                            InvitesService invitesService,
                            UserContextService userContextService) {
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.invitesRepository = invitesRepository;
         this.companyRepository = companyRepository;
         this.invitesService = invitesService;
         this.userContextService = userContextService;
@@ -54,21 +58,25 @@ public class TeamServiceImpl implements TeamService {
 
 
     @Override
+    @Transactional
     public void create(TeamDTO teamDTO) throws CustomException {
         validation(teamDTO);
         Team team = mapper(teamDTO);
         team.setFlag(Flag.ENABLED);
+        Company company = companyRepository.findCompanyByCompanyId(teamDTO.getCompanyId());
+        team.setCompany(company);
+
 
         team = teamRepository.save(team);
 
         if(teamDTO.getInvites().size() > 0){
             Team finalTeam = team;
             teamDTO.getInvites().forEach(invite -> {
-                InvitesDTO invitesDTO = new InvitesDTO(invite.getSurname(), invite.getOthernames(), invite.getEmail(), finalTeam.getId());
+                invite.setTeamId(finalTeam.getId());
                 try {
-                    invitesService.create(invitesDTO);
+                    invitesService.create(invite);
                 } catch (CustomException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e.getMessage());
                 }
             });
         }
@@ -79,11 +87,11 @@ public class TeamServiceImpl implements TeamService {
             teamDTO.getTeamMembers().forEach(teamMember -> {
                 Optional<User> user = userRepository.findById(teamMember.getId());
                 if(user.isPresent()){
-                    user.get().setTeam(finalTeam);
+                    user.get().getTeams().add(finalTeam);
                     try {
                         userService.update(userService.mapper(user.get()));
                     } catch (CustomException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException(e.getMessage());
                     }
                 }
             });
@@ -108,7 +116,10 @@ public class TeamServiceImpl implements TeamService {
     public TeamDTO find(Long teamId) throws CustomException {
         Optional<Team> team = teamRepository.findById(teamId);
         if(team.isPresent()){
-            return teamMapper.teamToTeamDTO(team.get());
+            TeamDTO teamDTO = teamMapper.teamToTeamDTO(team.get());
+            teamDTO.setInvites(invitesService.findInvitesByTeam(team.get()));
+            teamDTO.setTeamMembers(userService.findUsersByTeam(team.get()));
+            return teamDTO;
         }else{
             throw new CustomException("Team Not Found");
         }
@@ -142,6 +153,12 @@ public class TeamServiceImpl implements TeamService {
                     try {
                         InvitesDTO inviteDTO = invitesService.find(invite);
                         inviteDTO.setTeamId(teamId);
+                        inviteDTO.setLastModifiedDate(new Date());
+                        try {
+                            inviteDTO.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
+                        } catch (CustomException e) {
+                            throw new RuntimeException(e);
+                        }
                         invitesService.update(inviteDTO);
                     } catch (CustomException e) {
                         throw new RuntimeException(e);
@@ -153,7 +170,13 @@ public class TeamServiceImpl implements TeamService {
                 teamMemberAndInvite.getUserIds().forEach(userId  -> {
                     try {
                         UserDTO userDTO = userService.find(userId);
-                        userDTO.setTeamDTO(teamDTO);
+                        userDTO.getTeamDTO().add(teamDTO);
+                        userDTO.setLastModifiedDate(new Date());
+                        try {
+                            userDTO.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
+                        } catch (CustomException e) {
+                            throw new RuntimeException(e);
+                        }
                         userService.update(userDTO);
                     } catch (CustomException e) {
                         throw new RuntimeException(e);
@@ -162,6 +185,49 @@ public class TeamServiceImpl implements TeamService {
                 });
 
             }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void removeTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception {
+        Optional<Team> team = teamRepository.findById(teamId);
+
+        if(team.isPresent()) {
+            if(teamMemberAndInvite.getInvites().size() > 0){
+                teamMemberAndInvite.getInvites().forEach(invite -> {
+                    Optional<Invites> savedInvite = invitesRepository.findByIdAndTeam(invite, team.get());
+                    if(savedInvite.isPresent()){
+                        savedInvite.get().setTeam(null);
+                        savedInvite.get().setLastModifiedDate(new Date());
+                        try {
+                            savedInvite.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
+                        } catch (CustomException e) {
+                            throw new RuntimeException(e);
+                        }
+                        invitesRepository.save(savedInvite.get());
+                    }
+                });
+            }
+
+            if(teamMemberAndInvite.getUserIds().size() > 0){
+                teamMemberAndInvite.getUserIds().forEach(userId  -> {
+                    Optional<User> savedUser = userRepository.findUserByIdAndTeams(userId, team.get());
+                    if(savedUser.isPresent()){
+                        savedUser.get().getTeams().remove(team.get());
+                        savedUser.get().setLastModifiedDate(new Date());
+                        try {
+                            savedUser.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
+                        } catch (CustomException e) {
+                            throw new RuntimeException(e);
+                        }
+                        userRepository.save(savedUser.get());
+                    }
+                });
+
+            }
+        }else{
+            throw new CustomException("Team Not Found");
         }
     }
 

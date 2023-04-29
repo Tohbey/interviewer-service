@@ -45,22 +45,20 @@ public class InviteServiceImpl implements InvitesService {
     @Override
     public void create(InvitesDTO invitesDTO) throws CustomException {
         validation(invitesDTO);
+        Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
         Invites invite = invitesMapper.inviteDTOToInvite(invitesDTO);
+        invite.setCreatedDate(new Date());
+        invite.setCreatedBy(userContextService.getCurrentUserDTO().getFullname());
 
-        if(Objects.nonNull(invite.getTeam())){
-            Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
-            if(team.isPresent()){
-                invite.setTeam(team.get());
-                invite.setFlag(Flag.ENABLED);
+        if(team.isPresent()){
+            invite.setTeam(team.get());
+            invite.setTeam(team.get());
+            invite.setFlag(Flag.ENABLED);
 
-                invitesRepository.save(invite);
-            }else{
-                throw new CustomException("Team Not found");
-            }
+            invitesRepository.save(invite);
         }else{
-            throw new CustomException("Team Id cant be empty");
+            throw new CustomException("Team Not found");
         }
-
     }
 
     @Override
@@ -100,6 +98,20 @@ public class InviteServiceImpl implements InvitesService {
     }
 
 
+    @Override
+    public List<InvitesDTO> findInvitesByTeam(Team team) {
+        List<InvitesDTO> invitesDTOS = new ArrayList<>();
+        List<Invites> invites = invitesRepository.findAllByTeam(team);
+
+        invites.forEach(invite -> {
+            InvitesDTO invitesDTO = invitesMapper.inviteToInviteDTO(invite);
+            invitesDTO.setTeamId(team.getId());
+            invitesDTOS.add(invitesDTO);
+        });
+
+        return invitesDTOS;
+    }
+
     private void validation(InvitesDTO invitesDTO) throws CustomException {
         if(Objects.isNull(invitesDTO.getTeamId())){
             throw new CustomException("Team cant be empty");
@@ -114,8 +126,15 @@ public class InviteServiceImpl implements InvitesService {
                 throw new CustomException("Team info not found");
             }
 
-            if(invitesRepository.existsByEmailAndTeam(invitesDTO.getEmail(), invitesDTO.getTeamId())){
-                throw new CustomException("Invite has already been sent to this email");
+            if(Objects.nonNull(invitesDTO.getTeamId())){
+                Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
+                if(team.isPresent()){
+                    if(invitesRepository.existsByEmailAndTeam(invitesDTO.getEmail(), team.get())){
+                        throw new CustomException("Invite has already been sent to this email");
+                    }
+                }else{
+                    throw new CustomException("Team Info does not exist");
+                }
             }
         }
     }
@@ -140,8 +159,15 @@ public class InviteServiceImpl implements InvitesService {
                     throw new CustomException("Email Already Exist");
                 }
 
-                if(invitesRepository.existsByEmailAndTeam(invitesDTO.getEmail(), invitesDTO.getTeamId())){
-                    throw new CustomException("Invite has already been sent to this email");
+                if(Objects.nonNull(invitesDTO.getTeamId())){
+                    Optional<Team> team = teamRepository.findById(invitesDTO.getTeamId());
+                    if(team.isPresent()){
+                        if(invitesRepository.existsByEmailAndTeam(invitesDTO.getEmail(), team.get())){
+                            throw new CustomException("Invite has already been sent to this email");
+                        }
+                    }else{
+                        throw new CustomException("Team Info does not exist");
+                    }
                 }
             }
         }

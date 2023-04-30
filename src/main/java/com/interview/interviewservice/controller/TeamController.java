@@ -97,6 +97,7 @@ public class TeamController {
     }
 
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.POST, value = "add/team-members/{teamId}")
     public IDataResponse addTeamMembersAndInvitesByTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamMemberAndInvite teamMemberAndInvite){
         IDataResponse dataResponse = new IDataResponse();
@@ -112,13 +113,14 @@ public class TeamController {
         return dataResponse;
     }
 
+    //  Testing Completed.
     @RequestMapping(method = RequestMethod.POST, value = "remove/team-members/{teamId}")
     public IDataResponse removeTeamMembersAndInvitesByTeam(@PathVariable("teamId") Long teamId, @RequestBody TeamMemberAndInvite teamMemberAndInvite){
         IDataResponse dataResponse = new IDataResponse();
         try {
             teamService.removeTeamMembersAndInvitesByTeam(teamId, teamMemberAndInvite);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Invites Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
+            dataResponse.addMessage(new GlobalMessage("Team Successfully Updated","Updated", Message.Severity.SUCCESS));
         }catch (Exception e){
             e.printStackTrace();
             dataResponse.setValid(false);

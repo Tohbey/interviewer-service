@@ -4,9 +4,7 @@ import com.interview.interviewservice.entity.core.FlagableAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -27,8 +25,10 @@ public class User extends FlagableAuditableEntity {
 //    @JoinColumn(name = "team", referencedColumnName = "id")
 //    @ManyToOne(optional = true, fetch = FetchType.EAGER)
 //    private Team team;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Team> teams = new HashSet<Team>();
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinTable(name="user_team", joinColumns = @JoinColumn(name="user_id")
+            , inverseJoinColumns = @JoinColumn(name="team_id"))
+    private List<Team> teams = new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastAccessedDate;

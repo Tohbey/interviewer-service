@@ -31,6 +31,7 @@ public class JobController {
         this.jobTicketService = jobTicketService;
     }
 
+//  Test Completed✔
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createJob(@RequestBody JobDTO jobDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -46,6 +47,7 @@ public class JobController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{jobId}")
     public IDataResponse findJob(@PathVariable("jobId") Long jobId){
         IDataResponse dataResponse = new IDataResponse();

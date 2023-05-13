@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
+//  Testing Completed.
 @RestController
 @RequestMapping(CompanyController.BASE_URL)
 public class CompanyController {
@@ -35,7 +36,6 @@ public class CompanyController {
         this.jobService = jobService;
     }
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createCompany(@RequestBody CompanyDTO companyDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -51,7 +51,6 @@ public class CompanyController {
         return dataResponse;
     }
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{companyId}")
     public IDataResponse<CompanyDTO> findCompany(@PathVariable("companyId") Long companyId){
         IDataResponse<CompanyDTO> dataResponse = new IDataResponse<CompanyDTO>();
@@ -67,7 +66,6 @@ public class CompanyController {
         return dataResponse;
     }
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{companyId}")
     public IDataResponse deleteCompany(@PathVariable("companyId") Long companyId){
         IDataResponse dataResponse = new IDataResponse();
@@ -84,7 +82,6 @@ public class CompanyController {
     }
 
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateCompany(@RequestBody CompanyDTO companyDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -100,7 +97,6 @@ public class CompanyController {
         return dataResponse;
     }
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "teams/{companyId}")
     public IDataResponse<TeamDTO> findTeamsByCompany(@PathVariable("companyId") Long companyId){
         IDataResponse<TeamDTO> dataResponse = new IDataResponse<TeamDTO>();
@@ -116,7 +112,6 @@ public class CompanyController {
         return dataResponse;
     }
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "users/{companyId}/{flag}")
     public IDataResponse<UserDTO> findUsersByCompanyAndFlag(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<UserDTO> dataResponse = new IDataResponse<UserDTO>();
@@ -132,7 +127,6 @@ public class CompanyController {
         return dataResponse;
     }
 
-    //  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = "stages/{companyId}/{flag}")
     public IDataResponse<StageDTO> findStagesByCompany(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
         IDataResponse<StageDTO> dataResponse = new IDataResponse<StageDTO>();
@@ -148,8 +142,9 @@ public class CompanyController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "job/{companyId}/{flag}")
-    public IDataResponse<JobDTO> findJobsByCompanyAndFlag(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
+    @RequestMapping(method = RequestMethod.GET, value = "job/{companyId}")
+    public IDataResponse<JobDTO> findJobsByCompanyAndFlag(@PathVariable("companyId") String companyId,
+                                                          @RequestParam(value = "flag", required = false) Flag flag){
         IDataResponse<JobDTO> dataResponse = new IDataResponse<JobDTO>();
         try {
             dataResponse.setData(jobService.findJobsByCompany(companyId, flag));

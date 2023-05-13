@@ -12,11 +12,14 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.repository.StageRepository;
-import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.JobService;
 import com.interview.interviewservice.service.UserContextService;
+import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -50,9 +53,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void create(JobDTO jobDTO) throws CustomException {
+    @Transactional
+    public void create(JobDTO jobDTO) throws CustomException, ParseException {
+        jobDTO.setJobId("#".concat(RandomStringUtils.randomAlphanumeric(15)));
         validate(jobDTO);
         Job job = mapper(jobDTO);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        job.setDeadline(format.parse(jobDTO.getEndDate()));
 
         Company company = companyRepository.findCompanyByCompanyId(jobDTO.getCompanyId());
         job.setCompany(company);
@@ -77,6 +84,7 @@ public class JobServiceImpl implements JobService {
                 jobDTO.getStages().add(stageDTO);
             });
             jobDTO.setCompanyId(job.get().getCompany().getCompanyId());
+            jobDTO.setDeadLine(job.get().getDeadline());
 
             return jobDTO;
         }else{
@@ -117,13 +125,20 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobDTO> findJobsByCompany(Long companyId, Flag flag) throws CustomException {
+    public List<JobDTO> findJobsByCompany(String companyId, Flag flag) throws CustomException {
         List<JobDTO> jobDTOS = new ArrayList<>();
-        Optional<Company> company = companyRepository.findById(companyId);
-        if (company.isPresent()) {
-            List<Job> jobs = jobRepository.findAllByCompanyAndFlag(company.get(), flag);
+        Company company = companyRepository.findCompanyByCompanyId(companyId);
+        if (Objects.nonNull(company)) {
+            List<Job> jobs = new ArrayList<>();
+            if(Objects.nonNull(flag)){
+                jobs = jobRepository.findAllByCompanyAndFlag(company, flag);
+            }else{
+                jobs = jobRepository.findAllByCompany(company);
+            }
             jobs.forEach(job -> {
                 JobDTO jobDTO = jobMapper.jobToJobDTO(job);
+                jobDTO.setCompanyId(job.getCompany().getCompanyId());
+                jobDTO.setDeadLine(job.getDeadline());
                 jobDTOS.add(jobDTO);
             });
 
@@ -145,7 +160,6 @@ public class JobServiceImpl implements JobService {
         }
 
         jobDTO.getStages().forEach(stageDTO -> {
-//          trying to prevent duplicate stages.
             Optional<Stage> stageOptional = stageRepository.findById(stageDTO.getId());
             if(stageOptional.isEmpty()){
                 try {
@@ -155,6 +169,11 @@ public class JobServiceImpl implements JobService {
                 }
             }
         });
+
+        Optional<Job> job = jobRepository.findByJobId(jobDTO.getJobId());
+        if(job.isPresent()){
+            jobDTO.setJobId("#".concat(jobDTO.getCompanyId().substring(0, 2))+RandomStringUtils.randomAlphanumeric(13));
+        }
 
     }
 

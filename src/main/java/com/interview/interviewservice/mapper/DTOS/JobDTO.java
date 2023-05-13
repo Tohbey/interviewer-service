@@ -24,11 +24,11 @@ public class JobDTO extends BaseDTO {
 
     private String location;
 
+    private String country;
+
     private JobType jobType;
 
-    private String workType;
-
-    private List<StageDTO> stages;
+    private Set<StageDTO> stages = new HashSet<>();
 
     private String description;
 
@@ -38,7 +38,9 @@ public class JobDTO extends BaseDTO {
 
     private Set<String> requirements = new HashSet<>();
 
-    private Date deadline;
+    private String endDate;
+
+    private Date deadLine;
 
     private String companyId;
 }

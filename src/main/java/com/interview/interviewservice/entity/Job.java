@@ -17,18 +17,22 @@ import java.util.Set;
 public class Job extends FlagableAuditableEntity {
 
     private String title;
+
+    @Column(nullable = false, unique = true)
     private String jobId;
 
     private String section;
 
     private String location;
 
+    private String country;
+
     @Enumerated(EnumType.STRING)
     private JobType jobType;
 
-    private String workType;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name="job_stages", joinColumns = @JoinColumn(name="job_id")
+            , inverseJoinColumns = @JoinColumn(name="stages_id"))
     private List<Stage> stages;
 
     private String description;
@@ -54,8 +58,4 @@ public class Job extends FlagableAuditableEntity {
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @NotAudited
     private Company company;
-
-    private void setJobId(){
-        this.jobId = "#".concat(this.id.toString()).concat(this.company.getCompanyId());
-    }
 }

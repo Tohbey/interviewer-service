@@ -1,5 +1,6 @@
 package com.interview.interviewservice.dtos;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,8 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
-    private String jwt;
+public class TokenRefreshRequest {
     private String refreshToken;
-    private String tokenType;
 }

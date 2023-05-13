@@ -18,8 +18,6 @@ public class JwtUtils {
 
     private String jwtSecret="secret-";
 
-    private int jwtExpirationMs;
-
     public String generateJwtToken(CustomDetail userDetails) {
 
         Map<String, Object> claims = new HashMap<>();
@@ -56,5 +54,11 @@ public class JwtUtils {
         }
 
         return false;
+    }
+
+    public String generateTokenFromUsername(String username) {
+        return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + System.currentTimeMillis() + 1000 * 60 * 60 * 10)).signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
     }
 }

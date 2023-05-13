@@ -7,12 +7,14 @@ import com.interview.interviewservice.dtos.AuthenticationRequest;
 import com.interview.interviewservice.dtos.AuthenticationResponse;
 import com.interview.interviewservice.dtos.ForgotPasswordRequest;
 import com.interview.interviewservice.dtos.ResetPasswordRequest;
+import com.interview.interviewservice.entity.RefreshToken;
 import com.interview.interviewservice.entity.Token;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.jwt.JwtUtils;
 import com.interview.interviewservice.repository.TokenRepository;
 import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.AuthenticationService;
+import com.interview.interviewservice.service.RefreshTokenService;
 import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -56,17 +58,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserContextService userContextService;
 
+    private final RefreshTokenService refreshTokenService;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl .class);
 
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager,
                                      UserRepository userRepository,
                                      TokenRepository tokenRepository,
+                                     RefreshTokenService refreshTokenService,
                                      UserService userService, UserContextService userContextService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.userService = userService;
         this.tokenRepository = tokenRepository;
         this.userContextService = userContextService;
+        this.refreshTokenService = refreshTokenService;
     }
 
 
@@ -79,7 +85,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         final String token = jwtTokenUtils.generateJwtToken(userDetails);
 
-        return new AuthenticationResponse(token);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUser().getId());
+
+        return new AuthenticationResponse(token, refreshToken.getToken(), "bearer");
     }
 
     private void authenticate(String username, String password) throws Exception {

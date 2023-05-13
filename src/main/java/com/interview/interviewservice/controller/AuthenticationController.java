@@ -3,15 +3,16 @@ package com.interview.interviewservice.controller;
 
 import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
-import com.interview.interviewservice.dtos.AuthenticationRequest;
-import com.interview.interviewservice.dtos.AuthenticationResponse;
-import com.interview.interviewservice.dtos.ForgotPasswordRequest;
-import com.interview.interviewservice.dtos.ResetPasswordRequest;
+import com.interview.interviewservice.dtos.*;
+import com.interview.interviewservice.entity.RefreshToken;
+import com.interview.interviewservice.jwt.JwtUtils;
 import com.interview.interviewservice.model.Message;
 import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.AuthenticationService;
+import com.interview.interviewservice.service.RefreshTokenService;
 import com.interview.interviewservice.service.UserContextService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -27,9 +28,12 @@ public class AuthenticationController {
 
     private final UserContextService userContextService;
 
-    public AuthenticationController(AuthenticationService authenticationService, UserContextService userContextService) {
+    private final RefreshTokenService refreshTokenService;
+
+    public AuthenticationController(AuthenticationService authenticationService, UserContextService userContextService, RefreshTokenService refreshTokenService) {
         this.authenticationService = authenticationService;
         this.userContextService = userContextService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "login")
@@ -40,6 +44,22 @@ public class AuthenticationController {
             dataResponse.setData(Collections.singletonList(response));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Login Successfully","Login", Message.Severity.INFO));
+        } catch (Exception e) {
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+            e.printStackTrace();
+        }
+        return dataResponse;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "refresh-token")
+    public IDataResponse RefreshToken(@RequestBody @Valid TokenRefreshRequest tokenRefreshRequest) throws Exception {
+        IDataResponse dataResponse = new IDataResponse();
+        try {
+            AuthenticationResponse response = refreshTokenService.refresh(tokenRefreshRequest.getRefreshToken());
+            dataResponse.setData(Collections.singletonList(response));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("Token Refreshed Successfully","Refresh Token", Message.Severity.INFO));
         } catch (Exception e) {
             dataResponse.setValid(false);
             dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));

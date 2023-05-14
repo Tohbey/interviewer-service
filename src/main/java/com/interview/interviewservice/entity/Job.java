@@ -40,17 +40,22 @@ public class Job extends FlagableAuditableEntity {
     @ElementCollection
     @CollectionTable(name="qualification",
             joinColumns = @JoinColumn(name =  "jod_id"))
-    private Set<String> qualifications = new HashSet<>();
+    private List<String> qualifications;
 
     @ElementCollection
     @CollectionTable(name="responsibility",
             joinColumns = @JoinColumn(name =  "jod_id"))
-    private Set<String> responsibilities = new HashSet<>();
+    private List<String> responsibilities;
 
     @ElementCollection
     @CollectionTable(name="requirement",
             joinColumns = @JoinColumn(name =  "job"))
-    private Set<String> requirements = new HashSet<>();
+    private List<String> requirements;
+
+    @ElementCollection
+    @CollectionTable(name="skills",
+            joinColumns = @JoinColumn(name =  "job"))
+    private List<String> skills;
 
     private Date deadline;
 

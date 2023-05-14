@@ -38,6 +38,8 @@ public class JobDTO extends BaseDTO {
 
     private Set<String> requirements = new HashSet<>();
 
+    private Set<String> skills = new HashSet<>();
+
     private String endDate;
 
     private Date deadLine;

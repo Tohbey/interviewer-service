@@ -63,6 +63,7 @@ public class JobController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{jobId}")
     public IDataResponse deleteJob(@PathVariable("jobId") Long jobId){
         IDataResponse dataResponse = new IDataResponse();
@@ -78,13 +79,13 @@ public class JobController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.UPDATE)
     public IDataResponse updateJob(@RequestBody JobDTO jobDTO){
         IDataResponse dataResponse = new IDataResponse();
         try{
             jobService.update(jobDTO);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Job Successfully Created","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Job Successfully Updated","Updated", Message.Severity.INFO));
         }catch (Exception e){
             e.printStackTrace();
             dataResponse.setValid(false);

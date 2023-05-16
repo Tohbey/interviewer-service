@@ -79,7 +79,8 @@ public class JobController {
         return dataResponse;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = BaseResource.UPDATE)
+    //  Test Completed✔
+    @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateJob(@RequestBody JobDTO jobDTO){
         IDataResponse dataResponse = new IDataResponse();
         try{

@@ -13,7 +13,7 @@ public interface JobService {
 
     JobDTO find(Long jobId) throws CustomException;
 
-    void update(JobDTO jobDTO) throws CustomException;
+    void update(JobDTO jobDTO) throws CustomException, ParseException;
 
     void delete(Long jobId) throws CustomException;
 

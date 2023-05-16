@@ -16,6 +16,7 @@ import com.interview.interviewservice.service.JobService;
 import com.interview.interviewservice.service.UserContextService;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -58,8 +59,10 @@ public class JobServiceImpl implements JobService {
         jobDTO.setJobId("#".concat(RandomStringUtils.randomAlphanumeric(15)));
         validate(jobDTO);
         Job job = mapper(jobDTO);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        job.setDeadline(format.parse(jobDTO.getEndDate()));
+        if(StringUtils.isEmpty(jobDTO.getEndDate())){
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            job.setDeadline(format.parse(jobDTO.getEndDate()));
+        }
 
         Company company = companyRepository.findCompanyByCompanyId(jobDTO.getCompanyId());
         job.setCompany(company);
@@ -93,17 +96,23 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void update(JobDTO jobDTO) throws CustomException {
+    public void update(JobDTO jobDTO) throws CustomException, ParseException {
         Optional<Job> savedJob = jobRepository.findById(jobDTO.getId());
         if (savedJob.isPresent()) {
             validateUpdate(jobDTO, savedJob.get());
             Job job = mapper(jobDTO);
-
+            if(!StringUtils.isEmpty(jobDTO.getEndDate())){
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                job.setDeadline(format.parse(jobDTO.getEndDate()));
+            }
+            job.setFlag(savedJob.get().getFlag());
             List<Stage> stages = new ArrayList<>();
             jobDTO.getStages().forEach(stageDTO -> {
                 Optional<Stage> stageOptional = stageRepository.findById(stageDTO.getId());
                 stages.add(stageOptional.get());
             });
+            Company company = companyRepository.findCompanyByCompanyId(jobDTO.getCompanyId());
+            job.setCompany(company);
             job.setStages(stages);
             jobRepository.save(job);
         }else{

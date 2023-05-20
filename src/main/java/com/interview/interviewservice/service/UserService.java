@@ -5,12 +5,13 @@ import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.model.Flag;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 
 public interface UserService {
 
-    void create(UserDTO userDTO) throws CustomException;
+    void create(UserDTO userDTO) throws CustomException, MessagingException;
 
     void delete(Long userId) throws Exception;
 

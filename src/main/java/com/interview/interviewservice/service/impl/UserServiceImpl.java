@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service.impl;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.controller.AuthenticationController;
 import com.interview.interviewservice.entity.*;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
@@ -9,12 +10,15 @@ import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.mapper.mappers.UserMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.*;
+import com.interview.interviewservice.service.MailSender;
 import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
+import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +45,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MailSender mailSender;
+
+    @Value("${base.url}")
+    private String baseUrl;
 
     private final UserContextService userContextService;
 
@@ -70,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void create(UserDTO userDTO) throws CustomException {
+    public void create(UserDTO userDTO) throws CustomException, MessagingException {
         validation(userDTO);
         String password = RandomStringUtils.randomAlphabetic(10);
         logger.info("Password: {}",password);
@@ -103,7 +113,8 @@ public class UserServiceImpl implements UserService {
         verifyToken.setExpiredAt(expiredAt);
 
         Token savedToken = tokenRepository.save(verifyToken);
-        userCreationEmail(savedUser, savedToken);
+        verificationEmail(savedUser, savedToken);
+        userCreationEmail(savedUser, password);
     }
 
     @Override
@@ -273,7 +284,24 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void userCreationEmail(User user, Token token){
+    private void verificationEmail(User user, Token token) throws MessagingException {
+        HashMap<String, String> data = new HashMap<>();
 
+        data.put("userDescription", user.getUserFullName());
+        data.put("verificationLink", baseUrl+AuthenticationController.BASE_URL+"verify?email="+user.getEmail()+"&token="+token.getToken());
+
+        mailSender.send(user.getEmail(), "Email Address Verification" ,data, "email-verification.html");
+    }
+
+    private void userCreationEmail(User user, String password) throws MessagingException {
+        HashMap<String, String> data = new HashMap<>();
+
+        data.put("companyName", user.getCompany().getCompanyName());
+        data.put("userDescription", user.getUserFullName());
+        data.put("userRole", user.getRole().getRoleName().name());
+        data.put("username", user.getEmail());
+        data.put("password", password);
+
+        mailSender.send(user.getEmail(), "User Creation" ,data, "user-creation.html");
     }
 }

@@ -14,6 +14,7 @@ import com.interview.interviewservice.service.CompanyService;
 import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
+import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public void create(CompanyDTO companyDTO) throws CustomException {
+    public void create(CompanyDTO companyDTO) throws CustomException, MessagingException {
         validate(companyDTO);
         Company company = companyMapper.companyDTOToCompany(companyDTO);
         company.setCompanyId("#".concat(company.getCompanyId()).concat(company.getCompanyName().substring(0,2)));

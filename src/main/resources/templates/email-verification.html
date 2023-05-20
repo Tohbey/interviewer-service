@@ -1,0 +1,120 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body, * {
+        font-family: Raleway, "Open Sans", Arial, Helvetica, sans-serif !important;
+    }
+</style>
+
+<body class="em_body" style="margin:0px; padding:40px 0px;" bgcolor="#f5f6f9">
+<table align="center" width="500" bgcolor="#FFFFFF" border="0" cellspacing="0" cellpadding="0" class="em_main_table"
+       style="width:650px; box-shadow: -10px 10px 20px 0 rgba(30,30,30,0.05); margin-top:40px; background: #ffffff">
+
+    <!--Header Starts -->
+    <tr>
+        <td style="padding:15px 30px; border-bottom-width:1px; border-bottom-color:#e6e6e6; border-bottom-style:solid"
+            class="em_padd" valign="top" bgcolor="#FFFFFF" align="left">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
+                <tbody>
+                <tr>
+                    <td style="font-size:12px; line-height:15px; color:#0d1121;" valign="top" align="left"><img
+                            src="https://i.ibb.co/3hNztD8/human-manager-primary-logo.png" width="100"/></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <!--Header Ends -->
+
+    <!--Bottom Body Section Starts -->
+    <tr>
+        <td valign="top" align="center" style="padding:15px 30px;">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                <tbody>
+                <tr>
+                    <td valign="top" align="center">
+                        <strong style="font-family: raleway; font-weight: bold;text-align: center; font-size: 1.9rem"
+                                th:inline="text">Welcome to Interview.io!</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="left" style="padding-top:35px;">
+                        <strong style="font-size: 18px;" th:inline="text">Dear [[${userDescription}]],</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="left" style="font-size:14px; padding-left: 0; padding-top: 20px;">
+                        <p style="font-family: raleway; color: #5F6063; line-height: 27px;" th:inline="text">
+                            Please click on the link below to verify your email address. This is required to confirm ownership of the email address.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="left" style="font-size:14px; padding-left: 0; padding-top: 20px;">
+                        <a th:href="@{${verificationLink}}">
+                            Verify your email address
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="left"  style="font-size:14px; padding-left: 0; padding-top: 20px;">
+                        <p>
+                            If you're having trouble, try copying and pasting the following URL into your browser:
+                        </p>
+                        <a>[[${verificationLink}]]</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="left"
+                        style="font-size:14px; padding-left: 0; padding-top: 20px;" th:inline="text">
+                        This link is valid for 60 minutes only. If it has expired, log in to our client area to request a new link.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="left" style="font-size:14px; padding-left: 0; padding-top: 20px;">
+                        Thank you for using Interview.io.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <!--Bottom Body Section Ends -->
+    <!--Footer Section Starts -->
+    <tr>
+        <td style="background: #f5f6f9; font-size: 11px; padding-top: 40px; padding-bottom: 40px; width: 100%" valign="top" align="center" border="0">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                <tbody>
+                <tr>
+                    <td valign="top" align="center">
+                        <p style="text-align: center;font-size: 11px; margin-top: 15px;">
+                            <a style="color: #F26524;" href="mailto:support@interview.net">support@interbview.net
+                            </a>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="center">
+                        <p style="text-align: center;font-size: 12px; margin-top: 15px" th:inline="text">Copyright <span>&copy;</span> [[${copyrightYear}?:'2022']] Interview.io. All rights reserved.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="center">
+                        <p style="text-align: center;font-size: 11px; margin-top: 15px">Powered by TechBros</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <!--Footer Section Ends -->
+
+</table>
+</body>
+</html>
+

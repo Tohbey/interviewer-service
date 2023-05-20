@@ -73,10 +73,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         company = companyRepository.save(company);
 
-        String password = RandomStringUtils.randomAlphabetic(10);
-        logger.info("Password: {}",password);
-
-        String encryptedPassword = passwordEncoder.encode(password);
 
         if(Objects.nonNull(company.getContactData())){
             RoleDTO roleDTO = new RoleDTO(1L, RoleEnum.ADMIN_USER);
@@ -90,7 +86,7 @@ public class CompanyServiceImpl implements CompanyService {
                     company.getPicture(),
                     company.getCompanyId(),
                     true,
-                    encryptedPassword, roleDTO, null, false);
+                    "", roleDTO, null, false);
 
             userService.create(userDTO);
         }

@@ -92,27 +92,20 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encryptedPassword);
         user.setIsNewUser(true);
 
-        Company company = companyRepository.findCompanyByCompanyId(userDTO.getCompanyId());
-        Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());
-        user.setCompany(company);
-        role.ifPresent(user::setRole);
+        if(Objects.nonNull(userDTO.getCompanyId())){
+            Company company = companyRepository.findCompanyByCompanyId(userDTO.getCompanyId());
+            user.setCompany(company);
+        }
+
+        if(Objects.nonNull(userDTO.getRole())){
+            Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());
+            role.ifPresent(user::setRole);
+        }
 
         User savedUser = userRepository.save(user);
 
-        Token verifyToken = new Token();
-        String token = RandomStringUtils.randomAlphabetic(40);
+        Token savedToken = generateToken(savedUser);
 
-
-        //adding 20 minutes to the current time
-        Calendar present = Calendar.getInstance();
-        long timeInSecs = present.getTimeInMillis();
-        Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
-
-        verifyToken.setToken(token);
-        verifyToken.setUser(savedUser);
-        verifyToken.setExpiredAt(expiredAt);
-
-        Token savedToken = tokenRepository.save(verifyToken);
         verificationEmail(savedUser, savedToken);
         userCreationEmail(savedUser, password);
     }
@@ -265,7 +258,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validation(UserDTO user) throws CustomException {
-        Company company = companyRepository.findCompanyByCompanyId(user.getCompanyId());
+        if(Objects.nonNull(user.getCompanyId())){
+            if(!companyRepository.existsByCompanyIdIgnoreCase(user.getCompanyId())){
+                throw new CustomException("Associated Company Does Not Exist");
+            }
+        }
 
         if(userRepository.existsByEmailIgnoreCase(user.getEmail())){
             throw new CustomException("Email Already Exist");
@@ -273,10 +270,6 @@ public class UserServiceImpl implements UserService {
 
         if(userRepository.existsByPhoneNumberIgnoreCase(user.getPhoneNumber())){
             throw new CustomException("Phone Number Already Exist");
-        }
-
-        if(!companyRepository.existsByCompanyIdIgnoreCase(user.getCompanyId())){
-            throw new CustomException("Associated Company Does Not Exist");
         }
 
         if(roleRepository.findById(user.getRole().getId()).isEmpty()){
@@ -303,5 +296,21 @@ public class UserServiceImpl implements UserService {
         data.put("password", password);
 
         mailSender.send(user.getEmail(), "User Creation" ,data, "user-creation.html");
+    }
+
+    private Token generateToken(User savedUser){
+        Token verifyToken = new Token();
+        String token = RandomStringUtils.randomAlphabetic(40);
+
+        //adding 20 minutes to the current time
+        Calendar present = Calendar.getInstance();
+        long timeInSecs = present.getTimeInMillis();
+        Date expiredAt = new Date(timeInSecs + (20 * 60 * 1000));
+
+        verifyToken.setToken(token);
+        verifyToken.setUser(savedUser);
+        verifyToken.setExpiredAt(expiredAt);
+
+        return tokenRepository.save(verifyToken);
     }
 }

@@ -101,7 +101,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    public void delete(long teamId) throws CustomException {
+    public void delete(Long teamId) throws CustomException {
         Optional<Team> team = teamRepository.findById(teamId);
         if(team.isPresent()){
             team.get().setFlag(Flag.DISABLED);

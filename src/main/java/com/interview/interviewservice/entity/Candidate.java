@@ -12,7 +12,6 @@ import java.util.Set;
 public class Candidate extends FlagableAuditableEntity {
     private String surname;
     private String otherNames;
-    private String password;
     private String address;
     private String phoneNumber;
     private String email;
@@ -21,11 +20,11 @@ public class Candidate extends FlagableAuditableEntity {
 
     private String linkedln;
     private String resume;
+    private String github;
+    private String website;
 
-    @ElementCollection
-    @CollectionTable(name="links",
-            joinColumns = @JoinColumn(name =  "candidate"))
-    private Set<String> links = new HashSet<>();
+    @OneToOne
+    private User user;
 
     private String getUserFullName(){
         return this.surname.concat(" ").concat(this.otherNames);

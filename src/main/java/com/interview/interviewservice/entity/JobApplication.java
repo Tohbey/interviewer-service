@@ -20,7 +20,7 @@ public class JobApplication extends FlagableAuditableEntity {
     private Candidate candidate;
 
     @Enumerated(EnumType.STRING)
-    private ApplicationStatus jobType;
+    private ApplicationStatus status;
 
     private String comment;
 

@@ -25,7 +25,7 @@ public class JobTicket extends FlagableAuditableEntity {
     private Stage currentStage;
 
     @OneToMany
-    private List<Stage> stages;
+    private List<Stage> previousStages;
 
     @OneToOne
     private Job job;

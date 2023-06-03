@@ -26,7 +26,7 @@ public class StageController {
         this.stageService = stageService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = BaseResource.CREATE)
+    @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createStage(@RequestBody StageDTO stageDTO){
         IDataResponse dataResponse = new IDataResponse();
         try {
@@ -42,7 +42,7 @@ public class StageController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = BaseResource.UPDATE+BaseResource.RELATIVEPATH+"{stageId}")
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{stageId}")
     public IDataResponse findStage(@PathVariable("stageId") Long stageId){
         IDataResponse dataResponse = new IDataResponse();
         try {

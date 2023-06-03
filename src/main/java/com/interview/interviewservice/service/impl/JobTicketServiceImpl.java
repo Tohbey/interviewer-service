@@ -47,15 +47,14 @@ public class JobTicketServiceImpl implements JobTicketService {
         JobTicket jobTicket = jobTicketMapper.jobTicketDTOToJobTicket(jobTicketDTO);
         jobTicket.setFlag(Flag.ENABLED);
 
-        Optional<Stage> stage = stageRepository.findById(jobTicketDTO.getCurrentStage().getId());
         Optional<Job> job = jobRepository.findById(jobTicketDTO.getJob().getId());
         Optional<Candidate> candidate = candidateRepository.findById(jobTicketDTO.getCandidate().getId());
 
-        if(stage.isPresent() && job.isPresent() && candidate.isPresent()) {
+        if(job.isPresent() && candidate.isPresent()) {
 
             jobTicket.setCandidate(candidate.get());
             jobTicket.setJob(job.get());
-            jobTicket.setCurrentStage(stage.get());
+            jobTicket.setCurrentStage(job.get().getStages().get(0));
 
             jobTicketRepository.save(jobTicket);
         }
@@ -110,15 +109,16 @@ public class JobTicketServiceImpl implements JobTicketService {
         }
 
         if (Objects.nonNull(jobTicketDTO.getJob())) {
-            throw new CustomException("Current Stage cannot be null");
+            throw new CustomException("Job info cannot be null");
         }
+
         Optional<Job> job = jobRepository.findById(jobTicketDTO.getJob().getId());
         if(job.isEmpty()){
             throw new CustomException("Job not found");
         }
 
         if (Objects.nonNull(jobTicketDTO.getCandidate())) {
-            throw new CustomException("Current Stage cannot be null");
+            throw new CustomException("Candidate cannot be null");
         }
         Optional<Candidate> candidate = candidateRepository.findById(jobTicketDTO.getCandidate().getId());
         if(candidate.isEmpty()){
@@ -127,15 +127,6 @@ public class JobTicketServiceImpl implements JobTicketService {
 
         if(jobTicketRepository.existsByCandidateAndJobAndFlag(candidate.get(), job.get(), Flag.ENABLED)){
             throw new CustomException("Ticket already exist for this candidate");
-        }
-
-        if (Objects.nonNull(jobTicketDTO.getCurrentStage())) {
-            throw new CustomException("Current Stage cannot be null");
-        }
-
-        Optional<Stage> stage = stageRepository.findById(jobTicketDTO.getCurrentStage().getId());
-        if(stage.isEmpty()){
-            throw new CustomException("Stage not found");
         }
     }
 

@@ -14,4 +14,5 @@ public class JobApplicationDTO extends BaseDTO {
 
     private ApplicationStatus jobType;
 
+    private CompanyDTO companyDTO;
 }

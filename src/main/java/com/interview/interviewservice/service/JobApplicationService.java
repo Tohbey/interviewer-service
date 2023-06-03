@@ -18,6 +18,8 @@ public interface JobApplicationService {
 
     List<JobTicketService> jobApplicationByJob(Long jobId);
 
+    List<JobTicketService> jobApplicationByCandidate(Long candidate);
+
     void approveJobApplication(List<Long> ids, String comment);
 
     void rejectJobApplication(List<Long> ids, String comment);

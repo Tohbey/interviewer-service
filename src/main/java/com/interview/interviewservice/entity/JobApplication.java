@@ -23,4 +23,7 @@ public class JobApplication extends FlagableAuditableEntity {
     private ApplicationStatus jobType;
 
     private String comment;
+
+    @OneToOne
+    private Company company;
 }

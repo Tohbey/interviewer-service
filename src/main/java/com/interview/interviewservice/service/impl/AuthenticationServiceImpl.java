@@ -77,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws Exception {
+    public AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws CustomException {
         this.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
         final CustomDetail userDetails = userDetailsService
@@ -90,19 +90,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationResponse(token, refreshToken.getToken(), "bearer");
     }
 
-    private void authenticate(String username, String password) throws Exception {
+    private void authenticate(String username, String password) throws CustomException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
-            throw new Exception("USER DISABLED", e);
+            throw new CustomException("USER DISABLED", e);
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID CREDENTIALS", e);
+            throw new CustomException("INVALID CREDENTIALS", e);
         }
     }
 
     @Override
     @Transactional
-    public void verifyUser(String email, String token) throws Exception {
+    public void verifyUser(String email, String token) throws CustomException {
         if(StringUtils.isNotEmpty(email) && StringUtils.isNotEmpty(token)){
             //find user
             Optional<User> user = userRepository.findUserByEmail(email);
@@ -118,7 +118,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             //validate the token
             if (!rememberToken.get().getToken().equals(token)) {
-                throw new Exception("Incorrect Token");
+                throw new CustomException("Incorrect Token");
             }
 
             //update user
@@ -128,7 +128,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             userService.update(userService.mapper(user.get()));
         }else{
-            throw new Exception("Email or Token is Empty");
+            throw new CustomException("Email or Token is Empty");
         }
     }
 
@@ -138,11 +138,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+    public void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws CustomException {
         Optional<User> user = userContextService.getCurrentUser();
 
         if (!checkIfValidOldPassword(user.get(), forgotPasswordRequest.getOldPassword())) {
-            throw new Exception("Invalid Old Password");
+            throw new CustomException("Invalid Old Password");
         }
 
         String pwd = forgotPasswordRequest.getNewPassword();
@@ -180,7 +180,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public Optional<User> reset(String email, String token) throws Exception {
+    public Optional<User> reset(String email, String token) throws CustomException {
         Optional<User> user = userRepository.findUserByEmail(email);
         if (user.isEmpty()) {
             throw new CustomException("User Not Found. for EMAIL value " + email);
@@ -192,14 +192,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         if (!token.equals(passwordRetrieve.get().getToken())) {
-            throw new Exception("Incorrect Token");
+            throw new CustomException("Incorrect Token");
         }
 
         return user;
     }
 
     @Override
-    public void resetPassword(ResetPasswordRequest resetPasswordRequest) throws Exception {
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) throws CustomException {
         Optional<User> user = reset(resetPasswordRequest.getEmail(), resetPasswordRequest.getToken());
 
         String encryptPwd = passwordEncoder.encode(resetPasswordRequest.getPassword());

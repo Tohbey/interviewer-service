@@ -14,7 +14,7 @@ public interface TeamService {
 
     void update(TeamDTO teamDTO) throws CustomException;
 
-    void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception;
+    void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws CustomException;
 
-    void removeTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception;
+    void removeTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws CustomException;
 }

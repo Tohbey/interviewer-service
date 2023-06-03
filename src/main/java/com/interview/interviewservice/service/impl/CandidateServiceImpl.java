@@ -62,7 +62,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public void delete(Long candidateId) throws Exception {
+    public void delete(Long candidateId) throws CustomException {
         Optional<Candidate> candidate = candidateRepository.findById(candidateId);
         if(candidate.isPresent()){
             candidate.get().setFlag(Flag.DISABLED);
@@ -73,7 +73,7 @@ public class CandidateServiceImpl implements CandidateService {
                 userService.delete(candidate.get().getUser().getId());
             }
         }else{
-            throw new Exception("Candidate Not found");
+            throw new CustomException("Candidate Not found");
         }
     }
 
@@ -83,7 +83,7 @@ public class CandidateServiceImpl implements CandidateService {
         if(candidate.isPresent()){
             return candidateMapper.candidateToCandidateDTO(candidate.get());
         }else{
-            throw new Exception("Candidate Not found");
+            throw new CustomException("Candidate Not found");
         }
     }
 

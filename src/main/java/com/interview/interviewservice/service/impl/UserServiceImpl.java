@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Long userId) throws Exception {
+    public void delete(Long userId) throws CustomException {
         Optional<User> user = this.userRepository.findById(userId);
         if(user.isPresent()){
             user.get().setFlag(Flag.DISABLED);

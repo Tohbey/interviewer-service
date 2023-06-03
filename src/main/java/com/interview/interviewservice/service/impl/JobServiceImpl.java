@@ -16,11 +16,9 @@ import com.interview.interviewservice.service.JobService;
 import com.interview.interviewservice.service.UserContextService;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.*;
 
 @Service
@@ -55,14 +53,10 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional
-    public void create(JobDTO jobDTO) throws CustomException, ParseException {
+    public void create(JobDTO jobDTO) throws CustomException {
         jobDTO.setJobId("#".concat(RandomStringUtils.randomAlphanumeric(15)));
         validate(jobDTO);
         Job job = mapper(jobDTO);
-        if(StringUtils.isEmpty(jobDTO.getEndDate())){
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            job.setDeadline(format.parse(jobDTO.getEndDate()));
-        }
 
         Company company = companyRepository.findCompanyByCompanyId(jobDTO.getCompanyId());
         job.setCompany(company);
@@ -96,15 +90,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void update(JobDTO jobDTO) throws CustomException, ParseException {
+    public void update(JobDTO jobDTO) throws CustomException {
         Optional<Job> savedJob = jobRepository.findById(jobDTO.getId());
         if (savedJob.isPresent()) {
             validateUpdate(jobDTO, savedJob.get());
             Job job = mapper(jobDTO);
-            if(!StringUtils.isEmpty(jobDTO.getEndDate())){
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                job.setDeadline(format.parse(jobDTO.getEndDate()));
-            }
+
             job.setFlag(savedJob.get().getFlag());
             List<Stage> stages = new ArrayList<>();
             jobDTO.getStages().forEach(stageDTO -> {

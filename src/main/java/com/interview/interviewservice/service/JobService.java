@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface JobService {
 
-    void create(JobDTO jobDTO) throws CustomException, ParseException;
+    void create(JobDTO jobDTO) throws CustomException;
 
     JobDTO find(Long jobId) throws CustomException;
 
-    void update(JobDTO jobDTO) throws CustomException, ParseException;
+    void update(JobDTO jobDTO) throws CustomException;
 
     void delete(Long jobId) throws CustomException;
 

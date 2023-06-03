@@ -1,6 +1,10 @@
 package com.interview.interviewservice.exceptions;
 
+import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
+import com.interview.interviewservice.model.Message;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +31,7 @@ public class GlobalResponseException  extends ResponseEntityExceptionHandler{
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         IDataResponse response = new IDataResponse<>();
 
-        response.addMessage(ex.getMessage());
+        response.addMessage(new GlobalMessage(ex.getMessage(), null, Message.Severity.ERROR));
         response.setValid(false);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -37,7 +41,7 @@ public class GlobalResponseException  extends ResponseEntityExceptionHandler{
     protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         IDataResponse response = new IDataResponse<>();
 
-        response.addMessage(ex.getMessage());
+        response.addMessage(new GlobalMessage(ex.getMessage(), null, Message.Severity.ERROR));
         response.setValid(false);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -47,7 +51,7 @@ public class GlobalResponseException  extends ResponseEntityExceptionHandler{
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         IDataResponse response = new IDataResponse<>();
 
-        response.addMessage(ex.getMessage());
+        response.addMessage(new GlobalMessage(ex.getMessage(), null, Message.Severity.ERROR));
         response.setValid(false);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -58,9 +62,29 @@ public class GlobalResponseException  extends ResponseEntityExceptionHandler{
     public ResponseEntity<Object> handleAuthenticationException(Exception ex) {
         IDataResponse response = new IDataResponse<>();
 
-        response.addMessage(ex.getMessage());
+        response.addMessage(new GlobalMessage(ex.getMessage(), null, Message.Severity.ERROR));
         response.setValid(false);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Object> handleCustomException(CustomException ex){
+        IDataResponse response = new IDataResponse<>();
+
+        response.setValid(false);
+        response.addMessage(new GlobalMessage(ex.getMessage(), null, Message.Severity.ERROR));
+
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<Object> handleMessagingException(MessagingException ex){
+        IDataResponse response = new IDataResponse<>();
+
+        response.setValid(false);
+        response.addMessage(new GlobalMessage(ex.getMessage(), null, Message.Severity.ERROR));
+
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 }

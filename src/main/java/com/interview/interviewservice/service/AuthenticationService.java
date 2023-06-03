@@ -8,17 +8,17 @@ import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import java.util.Optional;
 
 public interface AuthenticationService {
-    AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws Exception;
+    AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws CustomException;
 
-    void verifyUser(String email, String token) throws Exception;
+    void verifyUser(String email, String token) throws CustomException;
 
     Boolean checkIfValidOldPassword(User user, String oldPassword);
 
-    void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws Exception;
+    void changePassword(ForgotPasswordRequest forgotPasswordRequest) throws CustomException;
 
     void recover(String email) throws CustomException;
 
-    Optional<User> reset(String email, String token) throws Exception;
+    Optional<User> reset(String email, String token) throws CustomException;
 
-    void resetPassword(ResetPasswordRequest resetPasswordRequest) throws Exception;
+    void resetPassword(ResetPasswordRequest resetPasswordRequest) throws CustomException;
 }

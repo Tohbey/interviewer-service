@@ -163,7 +163,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    public void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception {
+    public void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws CustomException {
         TeamDTO teamDTO = find(teamId);
 
         if(Objects.nonNull(teamDTO)){
@@ -201,7 +201,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    public void removeTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws Exception {
+    public void removeTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws CustomException {
         Optional<Team> team = teamRepository.findById(teamId);
 
         if(team.isPresent()) {

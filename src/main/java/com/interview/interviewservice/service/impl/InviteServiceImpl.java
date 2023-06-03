@@ -1,21 +1,15 @@
 package com.interview.interviewservice.service.impl;
 
 import com.interview.interviewservice.Util.CustomException;
-import com.interview.interviewservice.dtos.TeamMemberAndInvite;
 import com.interview.interviewservice.entity.Invites;
 import com.interview.interviewservice.entity.Team;
-import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.InvitesDTO;
-import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.mapper.mappers.InvitesMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.InvitesRepository;
 import com.interview.interviewservice.repository.TeamRepository;
-import com.interview.interviewservice.service.AuthenticationService;
 import com.interview.interviewservice.service.InvitesService;
 import com.interview.interviewservice.service.UserContextService;
-import com.interview.interviewservice.service.UserService;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

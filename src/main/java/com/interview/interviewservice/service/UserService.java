@@ -13,7 +13,7 @@ public interface UserService {
 
     void create(UserDTO userDTO) throws CustomException, MessagingException;
 
-    void delete(Long userId) throws Exception;
+    void delete(Long userId) throws CustomException;
 
     UserDTO find(Long userId) throws CustomException;
 

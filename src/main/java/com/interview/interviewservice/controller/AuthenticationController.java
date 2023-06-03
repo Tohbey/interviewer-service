@@ -37,7 +37,7 @@ public class AuthenticationController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "login")
-    public IDataResponse createAuthenticationToken(@RequestBody @Valid AuthenticationRequest authenticationRequest) throws Exception {
+    public IDataResponse createAuthenticationToken(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
         IDataResponse dataResponse = new IDataResponse();
         try {
             AuthenticationResponse response = this.authenticationService.createAuthenticationToken(authenticationRequest);
@@ -53,7 +53,7 @@ public class AuthenticationController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "refresh-token")
-    public IDataResponse RefreshToken(@RequestBody @Valid TokenRefreshRequest tokenRefreshRequest) throws Exception {
+    public IDataResponse RefreshToken(@RequestBody @Valid TokenRefreshRequest tokenRefreshRequest) {
         IDataResponse dataResponse = new IDataResponse();
         try {
             AuthenticationResponse response = refreshTokenService.refresh(tokenRefreshRequest.getRefreshToken());

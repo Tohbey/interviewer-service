@@ -11,8 +11,6 @@ public interface JobApplicationService {
 
     JobApplicationDTO find(Long jobApplicationId) throws CustomException;
 
-    void update(JobApplicationDTO jobApplicationDTO);
-
     void delete(Long jobApplicationId) throws CustomException;
 
     List<JobApplicationDTO> jobApplicationByCompany(String companyId) throws CustomException;
@@ -21,8 +19,11 @@ public interface JobApplicationService {
 
     List<JobApplicationDTO> jobApplicationByCandidate(Long candidateId) throws CustomException;
 
-    void approveJobApplication(List<Long> ids, String comment);
+    void approveJobApplications(List<Long> ids, String comment);
 
-    void rejectJobApplication(List<Long> ids, String comment);
+    void rejectJobApplications(List<Long> ids, String comment);
 
+    void approveJobApplication(Long id, String comment) throws CustomException;
+
+    void rejectJobApplication(Long id, String comment) throws CustomException;
 }

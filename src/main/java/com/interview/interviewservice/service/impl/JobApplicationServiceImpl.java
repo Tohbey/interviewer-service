@@ -23,29 +23,19 @@ import java.util.*;
 @Service
 public class JobApplicationServiceImpl implements JobApplicationService {
 
-    private final JobService jobService;
-
     private final JobRepository jobRepository;
-    
-    private final CandidateService candidateService;
-
     private final CandidateRepository candidateRepository;
-    
     private final CompanyRepository companyRepository;
-    
     private final JobApplicationRepository jobApplicationRepository;
-    
     private final JobApplicationMapper jobApplicationMapper;
     private final UserContextService userContextService;
 
 
-    public JobApplicationServiceImpl(JobService jobService, JobRepository jobRepository
-            , CandidateService candidateService, CandidateRepository candidateRepository,
+    public JobApplicationServiceImpl(JobRepository jobRepository
+            , CandidateRepository candidateRepository,
             CompanyRepository companyRepository, JobApplicationRepository jobApplicationRepository,
             JobApplicationMapper jobApplicationMapper, UserContextService userContextService) {
-        this.jobService = jobService;
         this.jobRepository = jobRepository;
-        this.candidateService = candidateService;
         this.candidateRepository = candidateRepository;
         this.companyRepository = companyRepository;
         this.jobApplicationRepository = jobApplicationRepository;
@@ -53,11 +43,26 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         this.userContextService = userContextService;
     }
 
+    // send email notification
     @Override
     public void create(JobApplicationDTO jobApplicationDTO) throws CustomException {
         validate(jobApplicationDTO);
         JobApplication jobApplication = jobApplicationMapper.jobApplicationDTOToJobApplication(jobApplicationDTO);
 
+        Company company = companyRepository.findCompanyByCompanyId(jobApplicationDTO.getCompanyDTO().getCompanyId());
+        jobApplication.setCompany(company);
+        jobApplication.setStatus(ApplicationStatus.REVIEW);
+        jobApplication.setFlag(Flag.ENABLED);
+
+        Optional<Job> job = jobRepository.findById(jobApplicationDTO.getJobDTO().getId());
+        Optional<Candidate> candidate = candidateRepository.findById(jobApplicationDTO.getCandidateDTO().getId());
+
+        if(job.isPresent() && candidate.isPresent()){
+            jobApplication.setJob(job.get());
+            jobApplication.setCandidate(candidate.get());
+
+            jobApplicationRepository.save(jobApplication);
+        }
     }
 
     @Override
@@ -68,11 +73,6 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         }else{
             throw new CustomException("Job Application not found");
         }
-    }
-
-    @Override
-    public void update(JobApplicationDTO jobApplicationDTO) {
-
     }
 
     @Override
@@ -142,7 +142,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     @Transactional
-    public void approveJobApplication(List<Long> ids, String comment) {
+    public void approveJobApplications(List<Long> ids, String comment) {
         ids.forEach(id -> {
             Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
             try {
@@ -168,7 +168,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     @Transactional
-    public void rejectJobApplication(List<Long> ids, String comment) {
+    public void rejectJobApplications(List<Long> ids, String comment) {
         ids.forEach(id -> {
             Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
             try {
@@ -177,6 +177,18 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @Override
+    public void approveJobApplication(Long id, String comment) throws CustomException {
+        Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
+        findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.ACCEPTED);
+    }
+
+    @Override
+    public void rejectJobApplication(Long id, String comment) throws CustomException {
+        Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
+        findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.REJECTED);
     }
 
     private void validate(JobApplicationDTO jobApplicationDTO) throws CustomException {
@@ -211,8 +223,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             throw new CustomException("You still have an application for this job under review");
         }
     }
-
-    private void validateUpdate(JobApplicationDTO jobApplicationDTO, JobApplication jobApplication){
+    private void JobApplicationProcessEmail(JobApplicationDTO job){
 
     }
 }

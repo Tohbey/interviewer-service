@@ -7,6 +7,7 @@ import com.interview.interviewservice.controller.UserController;
 import com.interview.interviewservice.jwt.JwtAuthenticationEntryPoint;
 import com.interview.interviewservice.jwt.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
@@ -87,18 +89,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Requestor-Type"));
-        configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));
-
+    public FilterRegistrationBean corsFilterRegistration(){
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://courageous-piroshki-f9154b.netlify.app/"));
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**",configuration);
 
-        return source;
+        FilterRegistrationBean filter = new FilterRegistrationBean(new CorsFilter(source));
+        filter.setOrder(0);
+        return filter;
     }
+
 
 }

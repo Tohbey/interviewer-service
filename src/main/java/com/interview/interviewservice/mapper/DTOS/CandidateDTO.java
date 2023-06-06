@@ -4,6 +4,9 @@ import com.interview.interviewservice.mapper.DTOS.core.BaseDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 public class CandidateDTO extends BaseDTO {
 
@@ -26,7 +29,7 @@ public class CandidateDTO extends BaseDTO {
 
     private String resume;
 
-    private String github;
+    private Set<EducationalHistoryDTO> educationalHistories = new HashSet<>();
 
-    private String website;
+    private Set<EmploymentHistoryDTO> employmentHistories = new HashSet<>();
 }

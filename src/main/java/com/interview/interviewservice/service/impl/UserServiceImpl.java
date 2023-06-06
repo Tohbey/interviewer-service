@@ -289,7 +289,11 @@ public class UserServiceImpl implements UserService {
     private void userCreationEmail(User user, String password) throws MessagingException {
         HashMap<String, String> data = new HashMap<>();
 
-        data.put("companyName", user.getCompany().getCompanyName());
+        if(Objects.nonNull(user.getCompany())){
+            data.put("companyName", user.getCompany().getCompanyName());
+        }else{
+            data.put("companyName", "Admin");
+        }
         data.put("userDescription", user.getUserFullName());
         data.put("userRole", user.getRole().getRoleName().name());
         data.put("username", user.getEmail());

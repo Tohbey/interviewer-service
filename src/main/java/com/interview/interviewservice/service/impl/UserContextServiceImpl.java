@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -52,7 +53,9 @@ public class UserContextServiceImpl implements UserContextService {
     public UserDTO getCurrentUserDTO() throws CustomException {
         User user = getCurrentUser().get();
         UserDTO userDTO = userMapper.userToUserDTO(user);
-        userDTO.setCompanyId(user.getCompany().getCompanyId());
+        if(Objects.nonNull(user.getCompany())){
+            userDTO.setCompanyId(user.getCompany().getCompanyId());
+        }
         userDTO.setRole(roleMapper.roleToRoleDTO(user.getRole()));
         userDTO.setFullname(user.getUserFullName());
         Set<TeamDTO> teamDTOs = new HashSet<TeamDTO>();

@@ -2,6 +2,7 @@ package com.interview.interviewservice.config;
 
 
 import com.interview.interviewservice.controller.AuthenticationController;
+import com.interview.interviewservice.controller.CandidateController;
 import com.interview.interviewservice.controller.CompanyController;
 import com.interview.interviewservice.controller.UserController;
 import com.interview.interviewservice.jwt.JwtAuthenticationEntryPoint;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
@@ -60,6 +62,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "forgot").permitAll()
                 .requestMatchers(HttpMethod.POST, AuthenticationController.BASE_URL + "reset").permitAll()
                 .requestMatchers(HttpMethod.POST, CompanyController.BASE_URL + "save").permitAll()
+                .requestMatchers(HttpMethod.POST, CandidateController.BASE_URL + "save").permitAll()
                 .requestMatchers(HttpMethod.POST, UserController.BASE_URL).permitAll()
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and()

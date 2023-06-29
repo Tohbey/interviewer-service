@@ -179,18 +179,6 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         });
     }
 
-    @Override
-    public void approveJobApplication(Long id, String comment) throws CustomException {
-        Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
-        findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.ACCEPTED);
-    }
-
-    @Override
-    public void rejectJobApplication(Long id, String comment) throws CustomException {
-        Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
-        findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.REJECTED);
-    }
-
     private void validate(JobApplicationDTO jobApplicationDTO) throws CustomException {
         if(Objects.isNull(jobApplicationDTO.getJobDTO())){
             throw new CustomException("Job Info is required");

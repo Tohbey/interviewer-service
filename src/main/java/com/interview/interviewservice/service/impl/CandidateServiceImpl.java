@@ -158,7 +158,6 @@ public class CandidateServiceImpl implements CandidateService {
         Candidate candidate = candidateMapper.candidateDTOToCandidate(candidateDTO);
 
         candidateRepository.save(candidate);
-
     }
 
     private void validation(CandidateDTO candidateDTO) throws CustomException {

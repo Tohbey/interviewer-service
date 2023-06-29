@@ -9,6 +9,7 @@ import com.interview.interviewservice.service.JobApplicationService;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -122,7 +123,7 @@ public class JobApplicationController {
         try {
             jobApplicationService.approveJobApplications(ids, comment);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Approved","Saved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);
@@ -137,7 +138,7 @@ public class JobApplicationController {
         try {
             jobApplicationService.rejectJobApplications(ids, comment);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Reject","Saved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);
@@ -150,9 +151,11 @@ public class JobApplicationController {
     public IDataResponse approveJobApplication(@PathVariable("jobApplicationId") Long id, @RequestParam("comment") String comment){
         IDataResponse dataResponse = new IDataResponse();
         try {
-            jobApplicationService.approveJobApplication(id, comment);
+            List<Long> ids = new ArrayList<Long>();
+            ids.add(id);
+            jobApplicationService.approveJobApplications(ids, comment);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Approved","Saved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);
@@ -165,9 +168,11 @@ public class JobApplicationController {
     public IDataResponse rejectJobApplication(@PathVariable("jobApplicationId") Long id, @RequestParam("comment") String comment){
         IDataResponse dataResponse = new IDataResponse();
         try {
-            jobApplicationService.rejectJobApplication(id, comment);
+            List<Long> ids = new ArrayList<Long>();
+            ids.add(id);
+            jobApplicationService.rejectJobApplications(ids, comment);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Job Application Successfully Rejected","Saved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);

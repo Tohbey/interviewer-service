@@ -22,8 +22,4 @@ public interface JobApplicationService {
     void approveJobApplications(List<Long> ids, String comment);
 
     void rejectJobApplications(List<Long> ids, String comment);
-
-    void approveJobApplication(Long id, String comment) throws CustomException;
-
-    void rejectJobApplication(Long id, String comment) throws CustomException;
 }

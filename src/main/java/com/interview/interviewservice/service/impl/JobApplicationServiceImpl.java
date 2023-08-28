@@ -6,6 +6,7 @@ import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Job;
 import com.interview.interviewservice.entity.JobApplication;
 import com.interview.interviewservice.mapper.DTOS.JobApplicationDTO;
+import com.interview.interviewservice.mapper.DTOS.JobTicketDTO;
 import com.interview.interviewservice.mapper.mappers.JobApplicationMapper;
 import com.interview.interviewservice.model.ApplicationStatus;
 import com.interview.interviewservice.model.Flag;
@@ -14,6 +15,7 @@ import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.JobApplicationRepository;
 import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,15 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     private final JobApplicationRepository jobApplicationRepository;
     private final JobApplicationMapper jobApplicationMapper;
     private final UserContextService userContextService;
+
+    @Autowired
+    private JobService jobService;
+
+    @Autowired
+    private CandidateService candidateService;
+
+    @Autowired
+    private JobTicketService jobTicketService;
 
 
     public JobApplicationServiceImpl(JobRepository jobRepository
@@ -147,10 +158,24 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
             try {
                 findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.ACCEPTED);
-            } catch (CustomException e) {
+                createJobTicket(jobApplication);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private void createJobTicket(Optional<JobApplication> jobApplication) throws Exception {
+        JobTicketDTO jobTicketDTO = new JobTicketDTO();
+
+        if(jobApplication.isPresent()){
+            jobTicketDTO.setJob(jobService.find(jobApplication.get().getJob().getId()));
+            jobTicketDTO.setCandidate(candidateService.find(jobApplication.get().getCandidate().getId()));
+
+            jobTicketService.create(jobTicketDTO);
+        }else{
+            throw new CustomException("Job Application not found");
+        }
     }
 
 //    sending email notification.

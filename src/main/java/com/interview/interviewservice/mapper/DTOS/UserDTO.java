@@ -36,7 +36,6 @@ public class UserDTO extends BaseDTO {
     @Column(name = "image")
     private String userImage;
 
-    @NotEmpty(message ="company cant be empty")
     private String companyId;
 
     private Boolean isNewUser;

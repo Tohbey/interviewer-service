@@ -130,6 +130,7 @@ public class CandidateServiceImpl implements CandidateService {
             if(educationalHistories.size() > 0){
                 educationalHistories.forEach(educationalHistory -> {
                     EducationalHistoryDTO educationalHistoryDTO = educationalHistoryMapper.educationHistoryToEducationHistoryDto(educationalHistory);
+                    educationalHistoryDTO.setCandidateId(candidateId);
                     candidateDTO.getEducationalHistories().add(educationalHistoryDTO);
                 });
             }
@@ -137,6 +138,7 @@ public class CandidateServiceImpl implements CandidateService {
             if(employmentHistories.size() > 0){
                 employmentHistories.forEach(employmentHistory -> {
                     EmploymentHistoryDTO employmentHistoryDTO = employmentHistoryMapper.employmentHistoryToEmploymentHistoryDto(employmentHistory);
+                    employmentHistoryDTO.setCandidateId(candidateId);
                     candidateDTO.getEmploymentHistories().add(employmentHistoryDTO);
                 });
             }
@@ -149,6 +151,8 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public void update(CandidateDTO candidateDTO) throws CustomException {
+        List<EducationalHistory> educationalHistories = new ArrayList<>();
+        List<EmploymentHistory> employmentHistories = new ArrayList<>();
         Optional<Candidate> savedCandidate = candidateRepository.findById(candidateDTO.getId());
 
         if(savedCandidate.isEmpty()) {
@@ -157,7 +161,29 @@ public class CandidateServiceImpl implements CandidateService {
         validateUpdate(candidateDTO, savedCandidate.get());
         Candidate candidate = candidateMapper.candidateDTOToCandidate(candidateDTO);
 
-        candidateRepository.save(candidate);
+        candidate.setFlag(Flag.ENABLED);
+
+        candidate = candidateRepository.save(candidate);
+        Candidate finalCandidate = candidate;
+
+        employmentHistoryRepository.deleteAllByCandidate(finalCandidate);
+        educationalHistoryRepository.deleteAllByCandidate(candidate);
+
+        candidateDTO.getEmploymentHistories().forEach(employmentHistoryDto -> {
+            EmploymentHistory employmentHistory = employmentHistoryMapper.employmentHistoryDtoToEmploymentHistory(employmentHistoryDto);
+            employmentHistory.setCandidate(finalCandidate);
+            employmentHistories.add(employmentHistory);
+        });
+
+        employmentHistoryRepository.saveAll(employmentHistories);
+
+        candidateDTO.getEducationalHistories().forEach(educationalHistoryDto -> {
+            EducationalHistory educationalHistory = educationalHistoryMapper.educationHistoryDtoToEducationHistory(educationalHistoryDto);
+            educationalHistory.setCandidate(finalCandidate);
+            educationalHistories.add(educationalHistory);
+        });
+
+        educationalHistoryRepository.saveAll(educationalHistories);
     }
 
     private void validation(CandidateDTO candidateDTO) throws CustomException {

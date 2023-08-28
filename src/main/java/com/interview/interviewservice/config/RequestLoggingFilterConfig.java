@@ -14,6 +14,7 @@ public class RequestLoggingFilterConfig {
         loggingFilter.setIncludePayload(true);
         loggingFilter.setMaxPayloadLength(100000);
         loggingFilter.setIncludeHeaders(false);
+        loggingFilter.setIncludePayload(false);
         loggingFilter.setAfterMessagePrefix("REQUEST DATA: ");
         return loggingFilter;
     }

@@ -12,4 +12,6 @@ import java.util.List;
 public interface EducationalHistoryRepository extends JpaRepository<EducationalHistory, Long> {
 
     List<EducationalHistory> findAllByCandidate(Candidate candidate);
+
+    void deleteAllByCandidate(Candidate candidate);
 }

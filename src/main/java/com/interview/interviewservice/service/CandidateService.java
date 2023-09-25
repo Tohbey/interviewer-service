@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.entity.Candidate;
 import com.interview.interviewservice.mapper.DTOS.CandidateDTO;
 import jakarta.mail.MessagingException;
 
@@ -11,6 +12,8 @@ public interface CandidateService {
     void delete(Long candidateId) throws Exception;
 
     CandidateDTO find(Long candidateId) throws Exception;
+
+    CandidateDTO candidateDtoMapper(Candidate candidate);
 
     void update(CandidateDTO candidateDTO) throws CustomException;
 }

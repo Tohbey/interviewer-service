@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.entity.Job;
 import com.interview.interviewservice.mapper.DTOS.JobDTO;
 import com.interview.interviewservice.model.Flag;
 
@@ -12,6 +13,8 @@ public interface JobService {
     void create(JobDTO jobDTO) throws CustomException;
 
     JobDTO find(Long jobId) throws CustomException;
+
+    JobDTO jobDtoMapper(Job job);
 
     void update(JobDTO jobDTO) throws CustomException;
 

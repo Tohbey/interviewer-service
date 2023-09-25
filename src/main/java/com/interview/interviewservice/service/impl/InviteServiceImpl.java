@@ -112,6 +112,7 @@ public class InviteServiceImpl implements InvitesService {
         invites.forEach(invite -> {
             InvitesDTO invitesDTO = invitesMapper.inviteToInviteDTO(invite);
             invitesDTO.setTeamId(team.getId());
+            invitesDTO.setTeam(team.getName());
             invitesDTOS.add(invitesDTO);
         });
 

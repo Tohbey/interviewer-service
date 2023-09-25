@@ -15,6 +15,7 @@ import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.JobApplicationRepository;
 import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.service.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         validate(jobApplicationDTO);
         JobApplication jobApplication = jobApplicationMapper.jobApplicationDTOToJobApplication(jobApplicationDTO);
 
-        Company company = companyRepository.findCompanyByCompanyId(jobApplicationDTO.getCompanyDTO().getCompanyId());
+        Company company = companyRepository.findCompanyByCompanyId(jobApplicationDTO.getCompanyId());
         jobApplication.setCompany(company);
         jobApplication.setStatus(ApplicationStatus.REVIEW);
         jobApplication.setFlag(Flag.ENABLED);
@@ -78,9 +79,15 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     public JobApplicationDTO find(Long jobApplicationId) throws CustomException {
+        JobApplicationDTO jobApplicationDTO = new JobApplicationDTO();
         Optional<JobApplication> jobApplication = jobApplicationRepository.findById(jobApplicationId);
         if(jobApplication.isPresent()){
-            return jobApplicationMapper.jobApplicationToJobApplicationDTO(jobApplication.get());
+            jobApplicationDTO = jobApplicationMapper.jobApplicationToJobApplicationDTO(jobApplication.get());
+
+            jobApplicationDTO.setCompanyId(jobApplication.get().getCompany().getCompanyId());
+            jobApplicationDTO.setCandidateDTO(candidateService.candidateDtoMapper(jobApplication.get().getCandidate()));
+            jobApplicationDTO.setJobDTO(jobService.jobDtoMapper(jobApplication.get().getJob()));
+            return jobApplicationDTO;
         }else{
             throw new CustomException("Job Application not found");
         }
@@ -144,9 +151,16 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     }
 
     private void extracted(List<JobApplicationDTO> jobApplicationDTOS, List<JobApplication> jobApplications) {
-        if(jobApplications.size() > 0){
+        if(!jobApplications.isEmpty()){
             jobApplications.forEach(jobApplication -> {
-                jobApplicationDTOS.add(jobApplicationMapper.jobApplicationToJobApplicationDTO(jobApplication));
+                JobApplicationDTO jobApplicationDTO = new JobApplicationDTO();
+                jobApplicationDTO = jobApplicationMapper.jobApplicationToJobApplicationDTO(jobApplication);
+
+                jobApplicationDTO.setCompanyId(jobApplication.getCompany().getCompanyId());
+                jobApplicationDTO.setCandidateDTO(candidateService.candidateDtoMapper(jobApplication.getCandidate()));
+                jobApplicationDTO.setJobDTO(jobService.jobDtoMapper(jobApplication.getJob()));
+
+                jobApplicationDTOS.add(jobApplicationDTO);
             });
         }
     }
@@ -223,12 +237,12 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             throw new CustomException("Candidate Info cant be found");
         }
         
-        if(Objects.isNull(jobApplicationDTO.getCompanyDTO())){
+        if(StringUtils.isEmpty(jobApplicationDTO.getCompanyId())){
             throw new CustomException("Job Info is required");
         }
 
-        Optional<Company> company = companyRepository.findById(jobApplicationDTO.getCompanyDTO().getId());
-        if(company.isEmpty()){
+        Company company = companyRepository.findCompanyByCompanyId(jobApplicationDTO.getCompanyId());
+        if(Objects.isNull(company)){
             throw new CustomException("Company Info cant be found");
         }
         

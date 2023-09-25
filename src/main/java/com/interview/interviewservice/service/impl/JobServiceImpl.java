@@ -54,7 +54,7 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public void create(JobDTO jobDTO) throws CustomException {
-        jobDTO.setJobId("#".concat(RandomStringUtils.randomAlphanumeric(15)));
+        jobDTO.setJobId(RandomStringUtils.randomAlphanumeric(15));
         validate(jobDTO);
         Job job = mapper(jobDTO);
 
@@ -62,10 +62,14 @@ public class JobServiceImpl implements JobService {
         job.setCompany(company);
         job.setFlag(Flag.ENABLED);
         List<Stage> stages = new ArrayList<>();
-        jobDTO.getStages().forEach(stageDTO -> {
+        for(StageDTO stageDTO: jobDTO.getStages()){
             Optional<Stage> stageOptional = stageRepository.findById(stageDTO.getId());
-            stages.add(stageOptional.get());
-        });
+            if(stageOptional.isPresent()){
+                stages.add(stageOptional.get());
+            }else{
+                throw new CustomException("Stages not found");
+            }
+        }
         job.setStages(stages);
 
         jobRepository.save(job);
@@ -75,19 +79,25 @@ public class JobServiceImpl implements JobService {
     public JobDTO find(Long jobId) throws CustomException {
         Optional<Job> job = jobRepository.findById(jobId);
         if (job.isPresent()) {
-            JobDTO jobDTO = jobMapper.jobToJobDTO(job.get());
-            job.get().getStages().forEach(stage -> {
-                StageDTO stageDTO = stageMapper.stageToStageDTO(stage);
-                jobDTO.getStages().add(stageDTO);
-            });
-            jobDTO.setCompanyId(job.get().getCompany().getCompanyId());
-            jobDTO.setDeadLine(job.get().getDeadline());
-
-            return jobDTO;
+            return jobDtoMapper(job.get());
         }else{
             throw new CustomException("Job Details not found");
         }
     }
+
+    @Override
+    public JobDTO jobDtoMapper(Job job) {
+        JobDTO jobDTO = jobMapper.jobToJobDTO(job);
+        job.getStages().forEach(stage -> {
+            StageDTO stageDTO = stageMapper.stageToStageDTO(stage);
+            jobDTO.getStages().add(stageDTO);
+        });
+        jobDTO.setCompanyId(job.getCompany().getCompanyId());
+        jobDTO.setDeadLine(job.getDeadline());
+
+        return jobDTO;
+    }
+
 
     @Override
     public void update(JobDTO jobDTO) throws CustomException {

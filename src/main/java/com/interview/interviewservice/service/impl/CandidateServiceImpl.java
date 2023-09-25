@@ -123,31 +123,38 @@ public class CandidateServiceImpl implements CandidateService {
 
         Optional<Candidate> candidate = candidateRepository.findById(candidateId);
         if(candidate.isPresent()){
-            List<EducationalHistory> educationalHistories = educationalHistoryRepository.findAllByCandidate(candidate.get());
-            List<EmploymentHistory> employmentHistories = employmentHistoryRepository.findAllByCandidate(candidate.get());
-
-            CandidateDTO candidateDTO = candidateMapper.candidateToCandidateDTO(candidate.get());
-            if(educationalHistories.size() > 0){
-                educationalHistories.forEach(educationalHistory -> {
-                    EducationalHistoryDTO educationalHistoryDTO = educationalHistoryMapper.educationHistoryToEducationHistoryDto(educationalHistory);
-                    educationalHistoryDTO.setCandidateId(candidateId);
-                    candidateDTO.getEducationalHistories().add(educationalHistoryDTO);
-                });
-            }
-
-            if(employmentHistories.size() > 0){
-                employmentHistories.forEach(employmentHistory -> {
-                    EmploymentHistoryDTO employmentHistoryDTO = employmentHistoryMapper.employmentHistoryToEmploymentHistoryDto(employmentHistory);
-                    employmentHistoryDTO.setCandidateId(candidateId);
-                    candidateDTO.getEmploymentHistories().add(employmentHistoryDTO);
-                });
-            }
-
-            return candidateDTO;
+            return candidateDtoMapper(candidate.get());
         }else{
             throw new CustomException("Candidate Not found");
         }
     }
+
+    @Override
+    public CandidateDTO candidateDtoMapper(Candidate candidate) {
+        List<EducationalHistory> educationalHistories = educationalHistoryRepository.findAllByCandidate(candidate);
+        List<EmploymentHistory> employmentHistories = employmentHistoryRepository.findAllByCandidate(candidate);
+
+        CandidateDTO candidateDTO = candidateMapper.candidateToCandidateDTO(candidate);
+        if(!educationalHistories.isEmpty()){
+            educationalHistories.forEach(educationalHistory -> {
+                EducationalHistoryDTO educationalHistoryDTO = educationalHistoryMapper.educationHistoryToEducationHistoryDto(educationalHistory);
+                educationalHistoryDTO.setCandidateId(candidate.getId());
+                candidateDTO.getEducationalHistories().add(educationalHistoryDTO);
+            });
+        }
+
+        if(!employmentHistories.isEmpty()){
+            employmentHistories.forEach(employmentHistory -> {
+                EmploymentHistoryDTO employmentHistoryDTO = employmentHistoryMapper.employmentHistoryToEmploymentHistoryDto(employmentHistory);
+                employmentHistoryDTO.setCandidateId(candidate.getId());
+                candidateDTO.getEmploymentHistories().add(employmentHistoryDTO);
+            });
+        }
+
+        return candidateDTO;
+
+    }
+
 
     @Override
     public void update(CandidateDTO candidateDTO) throws CustomException {

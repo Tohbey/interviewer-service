@@ -38,22 +38,22 @@ public class Job extends FlagableAuditableEntity {
     private String description;
 
     @ElementCollection
-    @CollectionTable(name="qualification",
+    @CollectionTable(name="job_qualification",
             joinColumns = @JoinColumn(name =  "jod_id"))
     private List<String> qualifications;
 
     @ElementCollection
-    @CollectionTable(name="responsibility",
+    @CollectionTable(name="job_responsibility",
             joinColumns = @JoinColumn(name =  "jod_id"))
     private List<String> responsibilities;
 
     @ElementCollection
-    @CollectionTable(name="requirement",
+    @CollectionTable(name="job_requirement",
             joinColumns = @JoinColumn(name =  "job"))
     private List<String> requirements;
 
     @ElementCollection
-    @CollectionTable(name="skills",
+    @CollectionTable(name="job_skills",
             joinColumns = @JoinColumn(name =  "job"))
     private List<String> skills;
 

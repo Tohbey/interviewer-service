@@ -27,6 +27,7 @@ public class JobApplicationController {
         this.jobApplicationService = jobApplicationService;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createApplication(@RequestBody JobApplicationDTO jobApplicationDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -42,6 +43,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{jobApplicationId}")
     public IDataResponse findApplication(@PathVariable("jobApplicationId") Long jobApplicationId){
         IDataResponse dataResponse = new IDataResponse();
@@ -72,6 +74,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = "company"+BaseResource.RELATIVEPATH+"{companyId}")
     public IDataResponse JobApplicationsByCompany(@PathVariable("companyId") String companyId){
         IDataResponse dataResponse = new IDataResponse();
@@ -87,6 +90,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = "job"+BaseResource.RELATIVEPATH+"{jobId}")
     public IDataResponse JobApplicationsByJob(@PathVariable("jobId") Long jobId){
         IDataResponse dataResponse = new IDataResponse();
@@ -102,6 +106,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = "candidate"+BaseResource.RELATIVEPATH+"{candidateId}")
     public IDataResponse JobApplicationsByCandidate(@PathVariable("candidateId") Long candidateId){
         IDataResponse dataResponse = new IDataResponse();

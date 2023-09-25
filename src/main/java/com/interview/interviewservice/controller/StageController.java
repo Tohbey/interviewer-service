@@ -63,7 +63,7 @@ public class StageController {
         try {
             stageService.update(stageDTO);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Stage Successfully Retrieved","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Stage Successfully Updated","Saved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);
@@ -78,7 +78,7 @@ public class StageController {
         try {
             stageService.delete(stageId);
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Stage Successfully Retrieved","Saved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Stage Successfully Deleted","Saved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);

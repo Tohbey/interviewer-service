@@ -43,8 +43,8 @@ public class StageServiceImpl implements StageService {
         Stage stage = mapper(stageDTO);
         stage.setFlag(Flag.ENABLED);
 
-        Optional<Company> company = companyRepository.findById(stageDTO.getCompanyId());
-        stage.setCompany(company.get());
+        Company company = this.companyRepository.findCompanyByCompanyId(stageDTO.getCompanyId());
+        stage.setCompany(company);
 
         stageRepository.save(stage);
     }
@@ -54,7 +54,7 @@ public class StageServiceImpl implements StageService {
         Optional<Stage> stage = stageRepository.findById(stageId);
         if(stage.isPresent()){
             StageDTO stageDTO = stageMapper.stageToStageDTO(stage.get());
-            stageDTO.setCompanyId(stage.get().getCompany().getId());
+            stageDTO.setCompanyId(stage.get().getCompany().getCompanyId());
             return stageDTO;
         }else{
             throw new CustomException("Stage Not found");
@@ -68,8 +68,8 @@ public class StageServiceImpl implements StageService {
             validateUpdate(stageDTO, savedStage.get());
             Stage stage = mapper(stageDTO);
             stage.setFlag(savedStage.get().getFlag());
-            Optional<Company> company = companyRepository.findById(stageDTO.getCompanyId());
-            stage.setCompany(company.get());
+            Company company = this.companyRepository.findCompanyByCompanyId(stageDTO.getCompanyId());
+            stage.setCompany(company);
 
             stageRepository.save(stage);
         }else{
@@ -92,14 +92,15 @@ public class StageServiceImpl implements StageService {
     }
 
     @Override
-    public List<StageDTO> findStagesByCompany(Long companyId, Flag flag) throws CustomException {
+    public List<StageDTO> findStagesByCompany(String companyId, Flag flag) throws CustomException {
         List<StageDTO> stageDTOS = new ArrayList<>();
-        Optional<Company> company = companyRepository.findById(companyId);
-        if(company.isEmpty()){
+        Company company = this.companyRepository.findCompanyByCompanyId(companyId);
+
+        if(Objects.isNull(company)){
             throw new CustomException("Company detail not found");
         }
 
-        List<Stage> stages = stageRepository.findAllByCompanyAndFlag(company.get(), flag);
+        List<Stage> stages = stageRepository.findAllByCompanyAndFlag(company, flag);
 
         stages.forEach(stage -> {
             StageDTO stageDTO = stageMapper.stageToStageDTO(stage);
@@ -116,25 +117,26 @@ public class StageServiceImpl implements StageService {
             throw new CustomException("Company detail is missing");
         }
 
-        Optional<Company> company = companyRepository.findById(stageDTO.getCompanyId());
-        if(company.isEmpty()){
+        Company company = this.companyRepository.findCompanyByCompanyId(stageDTO.getCompanyId());
+        if(Objects.isNull(company)){
             throw new CustomException("Company detail not found");
         }
 
-        if(stageRepository.existsByDescriptionAndCompany(stageDTO.getDescription(),company.get())){
+        if(stageRepository.existsByDescriptionAndCompany(stageDTO.getDescription(),company)){
             throw new CustomException("Stage Already exist");
         }
 
     }
 
     private void validateUpdate(StageDTO stageDTO, Stage savedStage) throws CustomException {
-        Optional<Company> company = companyRepository.findById(stageDTO.getCompanyId());
-        if(company.isEmpty()){
+        Company company = this.companyRepository.findCompanyByCompanyId(stageDTO.getCompanyId());
+
+        if(Objects.isNull(company)){
             throw new CustomException("Company detail not found");
         }
 
         if(!savedStage.getDescription().equalsIgnoreCase(stageDTO.getDescription())){
-            if(stageRepository.existsByDescriptionAndCompany(stageDTO.getDescription(),company.get())){
+            if(stageRepository.existsByDescriptionAndCompany(stageDTO.getDescription(),company)){
                 throw new CustomException("Stage Already exist");
             }
         }

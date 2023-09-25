@@ -68,7 +68,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void create(CompanyDTO companyDTO) throws CustomException, MessagingException {
         validate(companyDTO);
         Company company = companyMapper.companyDTOToCompany(companyDTO);
-        company.setCompanyId("#".concat(company.getCompanyId()).concat(company.getCompanyName().substring(0,2)));
+        company.setCompanyId(company.getCompanyId().concat(company.getCompanyName().substring(0,2)));
         company.setFlag(Flag.ENABLED);
 
         company = companyRepository.save(company);
@@ -107,25 +107,26 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDTO find(Long companyId) throws CustomException {
-        Optional<Company> company = this.companyRepository.findById(companyId);
-        if(company.isPresent()){
-            return companyMapper.companyToCompanyDTO(company.get());
+    public CompanyDTO find(String companyId) throws CustomException {
+        Company company = this.companyRepository.findCompanyByCompanyId(companyId);
+        if(Objects.nonNull(company)){
+            return companyMapper.companyToCompanyDTO(company);
         }else{
             throw new CustomException("Company Not Found");
         }
     }
 
     @Override
-    public List<TeamDTO> findTeamsByCompany(Long companyId) throws CustomException {
-        Optional<Company> company = this.companyRepository.findById(companyId);
-        if(company.isPresent()){
+    public List<TeamDTO> findTeamsByCompany(String companyId) throws CustomException {
+        Company company = this.companyRepository.findCompanyByCompanyId(companyId);
+
+        if(Objects.nonNull(company)){
             List<TeamDTO> teamDTOS = new ArrayList<>();
-            List<Team> teams = this.teamRepository.findTeamsByCompany(company.get());
+            List<Team> teams = this.teamRepository.findTeamsByCompany(company);
 
             teams.forEach(team -> {
                 TeamDTO teamDTO = teamMapper.teamToTeamDTO(team);
-                teamDTO.setCompanyId(company.get().getCompanyId());
+                teamDTO.setCompanyId(company.getCompanyId());
                 teamDTO.setInvites(invitesService.findInvitesByTeam(team));
                 teamDTO.setTeamMembers(userService.findUsersByTeam(team));
                 teamDTOS.add(teamDTO);

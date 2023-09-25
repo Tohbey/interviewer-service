@@ -14,9 +14,9 @@ public interface CompanyService {
 
     void delete(Long companyId) throws Exception;
 
-    CompanyDTO find(Long companyId) throws CustomException;
+    CompanyDTO find(String companyId) throws CustomException;
 
     void update(CompanyDTO companyDTO) throws CustomException;
 
-    List<TeamDTO> findTeamsByCompany(Long companyId) throws CustomException;
+    List<TeamDTO> findTeamsByCompany(String companyId) throws CustomException;
 }

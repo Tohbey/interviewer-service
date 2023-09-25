@@ -7,5 +7,5 @@ import lombok.Data;
 public class StageDTO extends BaseDTO {
     private String color;
     private String description;
-    private Long companyId;
+    private String companyId;
 }

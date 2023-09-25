@@ -52,7 +52,7 @@ public class CompanyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{companyId}")
-    public IDataResponse<CompanyDTO> findCompany(@PathVariable("companyId") Long companyId){
+    public IDataResponse<CompanyDTO> findCompany(@PathVariable("companyId") String companyId){
         IDataResponse<CompanyDTO> dataResponse = new IDataResponse<CompanyDTO>();
         try {
             dataResponse.setData(Collections.singletonList(companyService.find(companyId)));
@@ -98,7 +98,7 @@ public class CompanyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "teams/{companyId}")
-    public IDataResponse<TeamDTO> findTeamsByCompany(@PathVariable("companyId") Long companyId){
+    public IDataResponse<TeamDTO> findTeamsByCompany(@PathVariable("companyId") String companyId){
         IDataResponse<TeamDTO> dataResponse = new IDataResponse<TeamDTO>();
         try {
             dataResponse.setData(this.companyService.findTeamsByCompany(companyId));
@@ -113,7 +113,7 @@ public class CompanyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "users/{companyId}/{flag}")
-    public IDataResponse<UserDTO> findUsersByCompanyAndFlag(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
+    public IDataResponse<UserDTO> findUsersByCompanyAndFlag(@PathVariable("companyId") String companyId, @PathVariable("flag") Flag flag){
         IDataResponse<UserDTO> dataResponse = new IDataResponse<UserDTO>();
         try {
             dataResponse.setData(this.userService.findUsersBy(companyId, flag));
@@ -128,7 +128,7 @@ public class CompanyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "stages/{companyId}/{flag}")
-    public IDataResponse<StageDTO> findStagesByCompany(@PathVariable("companyId") Long companyId, @PathVariable("flag") Flag flag){
+    public IDataResponse<StageDTO> findStagesByCompany(@PathVariable("companyId") String companyId, @PathVariable("flag") Flag flag){
         IDataResponse<StageDTO> dataResponse = new IDataResponse<StageDTO>();
         try {
             dataResponse.setData(stageService.findStagesByCompany(companyId, flag));

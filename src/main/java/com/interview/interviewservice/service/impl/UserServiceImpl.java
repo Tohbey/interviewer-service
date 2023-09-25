@@ -151,14 +151,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> findUsersBy(Long companyId, Flag flag) throws CustomException {
+    public List<UserDTO> findUsersBy(String companyId, Flag flag) throws CustomException {
         List<UserDTO> userDTOS = new ArrayList<>();
-        Optional<Company> company = companyRepository.findById(companyId);
-        if(company.isEmpty()){
+        Company company = this.companyRepository.findCompanyByCompanyId(companyId);
+        if(Objects.isNull(company)){
             throw new CustomException("Company detail not found");
         }
 
-        List<User> users = userRepository.findAllByCompanyAndFlag(company.get(), flag);
+        List<User> users = userRepository.findAllByCompanyAndFlag(company, flag);
 
         users.forEach(user -> {
             UserDTO userDTO = mapper(user);
@@ -184,7 +184,6 @@ public class UserServiceImpl implements UserService {
         user.setIsActive(savedUser.get().getIsActive());
         user.setFlag(savedUser.get().getFlag());
         user.setLastModifiedDate(new Date());
-        user.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
 
         Company company = companyRepository.findCompanyByCompanyId(userDTO.getCompanyId());
         Optional<Role> role = roleRepository.findById(userDTO.getRole().getId());

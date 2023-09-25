@@ -54,6 +54,6 @@ public class MailSender {
 
         helper.setText(html, true);
 
-        javaMailSender.send(mimeMessage);
+//        javaMailSender.send(mimeMessage);
     }
 }

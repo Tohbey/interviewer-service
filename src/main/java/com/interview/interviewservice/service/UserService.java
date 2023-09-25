@@ -19,7 +19,7 @@ public interface UserService {
 
     void update(UserDTO userDTO) throws CustomException;
 
-    List<UserDTO> findUsersBy(Long companyId, Flag flag) throws CustomException;
+    List<UserDTO> findUsersBy(String companyId, Flag flag) throws CustomException;
 
     UserDTO mapper(User user);
 

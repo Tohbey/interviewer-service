@@ -22,9 +22,6 @@ public class User extends FlagableAuditableEntity {
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     private Company company;
 
-//    @JoinColumn(name = "team", referencedColumnName = "id")
-//    @ManyToOne(optional = true, fetch = FetchType.EAGER)
-//    private Team team;
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name="user_team", joinColumns = @JoinColumn(name="user_id")
             , inverseJoinColumns = @JoinColumn(name="team_id"))

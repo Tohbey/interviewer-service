@@ -17,5 +17,5 @@ public interface StageService {
 
     void delete(Long stageId) throws CustomException;
 
-    List<StageDTO> findStagesByCompany(Long companyId, Flag flag) throws CustomException;
+    List<StageDTO> findStagesByCompany(String companyId, Flag flag) throws CustomException;
 }

@@ -19,7 +19,7 @@ public interface JobApplicationService {
 
     List<JobApplicationDTO> jobApplicationByCandidate(Long candidateId) throws CustomException;
 
-    void approveJobApplications(List<Long> ids, String comment);
+    void approveJobApplications(List<Long> ids, String comment) throws Exception;
 
-    void rejectJobApplications(List<Long> ids, String comment);
+    void rejectJobApplications(List<Long> ids, String comment) throws CustomException;
 }

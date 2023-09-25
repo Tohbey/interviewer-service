@@ -12,7 +12,10 @@ import com.interview.interviewservice.repository.CandidateRepository;
 import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.repository.JobTicketRepository;
 import com.interview.interviewservice.repository.StageRepository;
+import com.interview.interviewservice.service.CandidateService;
+import com.interview.interviewservice.service.JobService;
 import com.interview.interviewservice.service.JobTicketService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +33,12 @@ public class JobTicketServiceImpl implements JobTicketService {
     private final JobRepository jobRepository;
 
     private final CandidateRepository candidateRepository;
+
+    @Autowired
+    private CandidateService candidateService;
+
+    @Autowired
+    private JobService jobService;
 
     private final StageRepository stageRepository;
 
@@ -64,7 +73,10 @@ public class JobTicketServiceImpl implements JobTicketService {
     public JobTicketDTO find(Long jobTicketId) throws CustomException {
         Optional<JobTicket> jobTicket = jobTicketRepository.findById(jobTicketId);
         if(jobTicket.isPresent()) {
-            return jobTicketMapper.jobTicketToJobTicketDTO(jobTicket.get());
+            JobTicketDTO jobTicketDTO = jobTicketMapper.jobTicketToJobTicketDTO(jobTicket.get());
+            jobTicketDTO.setCandidate(candidateService.candidateDtoMapper(jobTicket.get().getCandidate()));
+            jobTicketDTO.setJob(jobService.jobDtoMapper(jobTicket.get().getJob()));
+            return jobTicketDTO;
         }else{
             throw new CustomException("Ticket not found");
         }
@@ -108,7 +120,7 @@ public class JobTicketServiceImpl implements JobTicketService {
             throw new CustomException("JobTicketDTO cant be null");
         }
 
-        if (Objects.nonNull(jobTicketDTO.getJob())) {
+        if (Objects.isNull(jobTicketDTO.getJob())) {
             throw new CustomException("Job info cannot be null");
         }
 
@@ -117,7 +129,7 @@ public class JobTicketServiceImpl implements JobTicketService {
             throw new CustomException("Job not found");
         }
 
-        if (Objects.nonNull(jobTicketDTO.getCandidate())) {
+        if (Objects.isNull(jobTicketDTO.getCandidate())) {
             throw new CustomException("Candidate cannot be null");
         }
         Optional<Candidate> candidate = candidateRepository.findById(jobTicketDTO.getCandidate().getId());

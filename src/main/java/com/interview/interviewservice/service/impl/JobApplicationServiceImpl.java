@@ -167,24 +167,20 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     @Transactional
-    public void approveJobApplications(List<Long> ids, String comment) {
-        ids.forEach(id -> {
+    public void approveJobApplications(List<Long> ids, String comment) throws Exception {
+        for(Long id: ids){
             Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
-            try {
-                findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.ACCEPTED);
-                createJobTicket(jobApplication);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+            findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.ACCEPTED);
+            createJobTicket(jobApplication);
+        }
     }
 
     private void createJobTicket(Optional<JobApplication> jobApplication) throws Exception {
         JobTicketDTO jobTicketDTO = new JobTicketDTO();
 
         if(jobApplication.isPresent()){
-            jobTicketDTO.setJob(jobService.find(jobApplication.get().getJob().getId()));
-            jobTicketDTO.setCandidate(candidateService.find(jobApplication.get().getCandidate().getId()));
+            jobTicketDTO.setJob(jobService.jobDtoMapper(jobApplication.get().getJob()));
+            jobTicketDTO.setCandidate(candidateService.candidateDtoMapper(jobApplication.get().getCandidate()));
 
             jobTicketService.create(jobTicketDTO);
         }else{
@@ -207,15 +203,11 @@ public class JobApplicationServiceImpl implements JobApplicationService {
 
     @Override
     @Transactional
-    public void rejectJobApplications(List<Long> ids, String comment) {
-        ids.forEach(id -> {
+    public void rejectJobApplications(List<Long> ids, String comment) throws CustomException {
+        for(Long id: ids){
             Optional<JobApplication> jobApplication = jobApplicationRepository.findById(id);
-            try {
-                findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.REJECTED);
-            } catch (CustomException e) {
-                throw new RuntimeException(e);
-            }
-        });
+            findAndUpdateJobApplication(comment, jobApplication, ApplicationStatus.REJECTED);
+        }
     }
 
     private void validate(JobApplicationDTO jobApplicationDTO) throws CustomException {

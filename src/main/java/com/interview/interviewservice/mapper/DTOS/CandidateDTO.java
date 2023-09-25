@@ -32,4 +32,8 @@ public class CandidateDTO extends BaseDTO {
     private Set<EducationalHistoryDTO> educationalHistories = new HashSet<>();
 
     private Set<EmploymentHistoryDTO> employmentHistories = new HashSet<>();
+
+    private String setFullName(){
+       return this.surname.concat(" ").concat(this.otherNames);
+    }
 }

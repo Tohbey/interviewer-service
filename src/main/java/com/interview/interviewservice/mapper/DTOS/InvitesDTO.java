@@ -13,4 +13,5 @@ public class InvitesDTO extends BaseDTO {
     private String othernames;
     private String email;
     private Long teamId;
+    private String team;
 }

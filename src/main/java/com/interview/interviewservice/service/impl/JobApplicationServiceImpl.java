@@ -105,15 +105,21 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     }
 
     @Override
-    public List<JobApplicationDTO> jobApplicationByCompany(String companyId) throws CustomException {
+    public List<JobApplicationDTO> jobApplicationByCompany(String companyId, ApplicationStatus status) throws CustomException {
         List<JobApplicationDTO> jobApplicationDTOS = new ArrayList<>();
-        
+
+        List<JobApplication> jobApplications = new ArrayList<>();
+
         Company company = companyRepository.findCompanyByCompanyId(companyId);
         if(Objects.isNull(company)){
             throw new CustomException("Company Info not found");
         }
-        
-        List<JobApplication> jobApplications = jobApplicationRepository.findAllByCompany(company);
+
+        if(Objects.isNull(status)){
+            jobApplications = jobApplicationRepository.findAllByCompany(company);
+        }else{
+            jobApplications = jobApplicationRepository.findAllByCompanyAndStatus(company, status);
+        }
 
         extracted(jobApplicationDTOS, jobApplications);
         
@@ -121,30 +127,42 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     }
 
     @Override
-    public List<JobApplicationDTO> jobApplicationByJob(Long jobId) throws CustomException {
+    public List<JobApplicationDTO> jobApplicationByJob(Long jobId, ApplicationStatus status) throws CustomException {
         List<JobApplicationDTO> jobApplicationDTOS = new ArrayList<>();
-        
+
+        List<JobApplication> jobApplications = new ArrayList<>();
+
         Optional<Job> job = jobRepository.findById(jobId);
         if(job.isEmpty()){
             throw new CustomException("Job Info not found");
         }
 
-        List<JobApplication> jobApplications = jobApplicationRepository.findAllByJob(job.get());
+        if(Objects.isNull(status)){
+            jobApplications = jobApplicationRepository.findAllByJob(job.get());
+        }else{
+            jobApplications = jobApplicationRepository.findAllByJobAndStatus(job.get(), status);
+        }
 
         extracted(jobApplicationDTOS, jobApplications);
         return jobApplicationDTOS;
     }
 
     @Override
-    public List<JobApplicationDTO> jobApplicationByCandidate(Long candidateId) throws CustomException {
+    public List<JobApplicationDTO> jobApplicationByCandidate(Long candidateId, ApplicationStatus status) throws CustomException {
         List<JobApplicationDTO> jobApplicationDTOS = new ArrayList<>();
-        
+
+        List<JobApplication> jobApplications = new ArrayList<>();
+
         Optional<Candidate> candidate = candidateRepository.findById(candidateId);
         if(candidate.isEmpty()){
             throw new CustomException("candidate Info not found");
         }
 
-        List<JobApplication> jobApplications = jobApplicationRepository.findAllByCandidate(candidate.get());
+        if(Objects.isNull(status)){
+            jobApplications = jobApplicationRepository.findAllByCandidate(candidate.get());
+        }else{
+            jobApplications = jobApplicationRepository.findAllByCandidateAndStatus(candidate.get(), status);
+        }
 
         extracted(jobApplicationDTOS, jobApplications);
         return jobApplicationDTOS;

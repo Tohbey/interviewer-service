@@ -3,6 +3,7 @@ package com.interview.interviewservice.controller;
 import com.interview.interviewservice.Util.GlobalMessage;
 import com.interview.interviewservice.Util.IDataResponse;
 import com.interview.interviewservice.mapper.DTOS.JobApplicationDTO;
+import com.interview.interviewservice.model.ApplicationStatus;
 import com.interview.interviewservice.model.Message;
 import com.interview.interviewservice.resource.BaseResource;
 import com.interview.interviewservice.service.JobApplicationService;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+//  Testing Completed.
 @RestController
 @RequestMapping(value = JobApplicationController.BASE_URL)
 public class JobApplicationController {
@@ -76,10 +77,10 @@ public class JobApplicationController {
 
     //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = "company"+BaseResource.RELATIVEPATH+"{companyId}")
-    public IDataResponse JobApplicationsByCompany(@PathVariable("companyId") String companyId){
+    public IDataResponse JobApplicationsByCompany(@PathVariable("companyId") String companyId, @RequestParam(value = "status", required = false) ApplicationStatus status){
         IDataResponse dataResponse = new IDataResponse();
         try {
-            dataResponse.setData(jobApplicationService.jobApplicationByCompany(companyId));
+            dataResponse.setData(jobApplicationService.jobApplicationByCompany(companyId, status));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
         }catch (Exception e) {
@@ -92,10 +93,10 @@ public class JobApplicationController {
 
     //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = "job"+BaseResource.RELATIVEPATH+"{jobId}")
-    public IDataResponse JobApplicationsByJob(@PathVariable("jobId") Long jobId){
+    public IDataResponse JobApplicationsByJob(@PathVariable("jobId") Long jobId, @RequestParam(value = "status", required = false) ApplicationStatus status){
         IDataResponse dataResponse = new IDataResponse();
         try {
-            dataResponse.setData(jobApplicationService.jobApplicationByJob(jobId));
+            dataResponse.setData(jobApplicationService.jobApplicationByJob(jobId, status));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
         }catch (Exception e) {
@@ -108,10 +109,10 @@ public class JobApplicationController {
 
     //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = "candidate"+BaseResource.RELATIVEPATH+"{candidateId}")
-    public IDataResponse JobApplicationsByCandidate(@PathVariable("candidateId") Long candidateId){
+    public IDataResponse JobApplicationsByCandidate(@PathVariable("candidateId") Long candidateId, @RequestParam(value = "status", required = false) ApplicationStatus status){
         IDataResponse dataResponse = new IDataResponse();
         try {
-            dataResponse.setData(jobApplicationService.jobApplicationByCandidate(candidateId));
+            dataResponse.setData(jobApplicationService.jobApplicationByCandidate(candidateId, status));
             dataResponse.setValid(true);
             dataResponse.addMessage(new GlobalMessage("Job Application Successfully Retrieved","Saved", Message.Severity.INFO));
         }catch (Exception e) {

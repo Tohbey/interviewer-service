@@ -21,4 +21,11 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
     List<JobApplication> findAllByCompany(Company company);
 
     List<JobApplication> findAllByCandidate(Candidate candidate);
+
+    List<JobApplication> findAllByJobAndStatus(Job job, ApplicationStatus status);
+
+    List<JobApplication> findAllByCompanyAndStatus(Company company, ApplicationStatus status);
+
+    List<JobApplication> findAllByCandidateAndStatus(Candidate candidate, ApplicationStatus status);
+
 }

@@ -136,7 +136,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO mapper(User user){
         UserDTO userDTO = userMapper.userToUserDTO(user);
-        userDTO.setCompanyId(user.getCompany().getCompanyId());
+        if(Objects.nonNull(user.getCompany())){
+            userDTO.setCompanyId(user.getCompany().getCompanyId());
+        }
         userDTO.setRole(roleMapper.roleToRoleDTO(user.getRole()));
         userDTO.setFullname(user.getUserFullName());
         Set<TeamDTO> teamDTOs = new HashSet<TeamDTO>();
@@ -234,11 +236,15 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        if(!savedUser.getCompany().getCompanyId()
-                .equalsIgnoreCase(userDTO.getCompanyId())){
-            if(Objects.isNull(company)){
-                throw new CustomException("Company Details not found");
+        if(Objects.nonNull(savedUser.getCompany()) ||
+                Objects.nonNull(userDTO.getCompanyId())){
+            if(!savedUser.getCompany().getCompanyId()
+                    .equalsIgnoreCase(userDTO.getCompanyId())){
+                if(Objects.isNull(company)){
+                    throw new CustomException("Company Details not found");
+                }
             }
+
         }
 
         if(Objects.nonNull(userDTO.getTeamDTO()) && Objects.nonNull(savedUser.getTeams())){

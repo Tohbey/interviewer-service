@@ -63,7 +63,7 @@ public class InviteServiceImpl implements InvitesService {
             InvitesDTO invitesDTO = invitesMapper.inviteToInviteDTO(invite.get());
             invitesDTO.setFlag(invite.get().getFlag());
             if(Objects.nonNull(invite.get().getTeam())){
-                invitesDTO.setTeam(invite.get().getTeam().getName());
+                invitesDTO.setTeamName(invite.get().getTeam().getName());
                 invitesDTO.setTeamId(invite.get().getTeam().getId());
             }
             return invitesDTO;
@@ -112,7 +112,7 @@ public class InviteServiceImpl implements InvitesService {
         invites.forEach(invite -> {
             InvitesDTO invitesDTO = invitesMapper.inviteToInviteDTO(invite);
             invitesDTO.setTeamId(team.getId());
-            invitesDTO.setTeam(team.getName());
+            invitesDTO.setTeamName(team.getName());
             invitesDTOS.add(invitesDTO);
         });
 

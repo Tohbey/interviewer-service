@@ -23,6 +23,7 @@ public class CandidateController {
         this.candidateService = candidateService;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createCandidate(@RequestBody CandidateDTO candidateDTO) {
         IDataResponse dataResponse = new IDataResponse();
@@ -38,6 +39,7 @@ public class CandidateController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{candidateId}")
     public IDataResponse<CandidateDTO> findCandidate(@PathVariable("candidateId") Long candidateId) {
         IDataResponse<CandidateDTO> dataResponse = new IDataResponse<CandidateDTO>();
@@ -53,6 +55,7 @@ public class CandidateController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{candidateId}")
     public IDataResponse deleteCandidate(@PathVariable("candidateId") Long candidateId) {
         IDataResponse dataResponse = new IDataResponse();

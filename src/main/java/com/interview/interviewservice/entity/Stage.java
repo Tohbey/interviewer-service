@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.envers.NotAudited;
 
+import java.util.Objects;
+
 @Data
 @Entity
 public class Stage extends FlagableAuditableEntity {

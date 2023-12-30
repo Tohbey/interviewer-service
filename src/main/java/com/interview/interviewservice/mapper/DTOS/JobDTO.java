@@ -8,10 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class JobDTO extends BaseDTO {
@@ -28,7 +25,7 @@ public class JobDTO extends BaseDTO {
 
     private JobType jobType;
 
-    private Set<StageDTO> stages = new HashSet<>();
+    private List<StageDTO> stages = new ArrayList<>();
 
     private String description;
 

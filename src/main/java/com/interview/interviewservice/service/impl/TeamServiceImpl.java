@@ -18,6 +18,7 @@ import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -253,8 +254,8 @@ public class TeamServiceImpl implements TeamService {
             throw new CustomException("Team Name Already Exist");
         }
 
-        if(teamRepository.existsBySectionAndCompany(teamDTO.getSection(), company)){
-            throw new CustomException("Section Already Exist");
+        if(StringUtils.isEmpty(teamDTO.getSection())){
+            throw new CustomException("Section cant be empty");
         }
     }
 
@@ -272,8 +273,8 @@ public class TeamServiceImpl implements TeamService {
         }
 
         if(!savedTeam.getSection().equalsIgnoreCase(teamDTO.getSection())){
-            if(teamRepository.existsBySectionAndCompany(teamDTO.getSection(), company)){
-                throw new CustomException("Section Already Exist");
+            if(StringUtils.isEmpty(teamDTO.getSection())){
+                throw new CustomException("Section cant be empty");
             }
         }
     }

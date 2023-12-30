@@ -59,11 +59,15 @@ public class JobServiceImpl implements JobService {
         Job job = mapper(jobDTO);
 
         Company company = companyRepository.findCompanyByCompanyId(jobDTO.getCompanyId());
+        if(Objects.isNull(company)){
+            throw  new CustomException("Company not found");
+        }
+
         job.setCompany(company);
         job.setFlag(Flag.ENABLED);
         List<Stage> stages = new ArrayList<>();
         for(StageDTO stageDTO: jobDTO.getStages()){
-            Optional<Stage> stageOptional = stageRepository.findById(stageDTO.getId());
+            Optional<Stage> stageOptional = stageRepository.findByIdAndCompany(stageDTO.getId(), company);
             if(stageOptional.isPresent()){
                 stages.add(stageOptional.get());
             }else{
@@ -165,8 +169,10 @@ public class JobServiceImpl implements JobService {
             throw new CustomException("Company Details not found");
         }
 
-        if(jobRepository.existsByTitleAndCompany(jobDTO.getTitle(), company)){
-            throw new CustomException("Job Title Already Exist");
+        Set<StageDTO> stageSet = new HashSet<>(jobDTO.getStages());
+
+        if (jobDTO.getStages().size() != stageSet.size()) {
+            throw new CustomException("Duplicate Stages dedicated");
         }
 
         jobDTO.getStages().forEach(stageDTO -> {
@@ -200,8 +206,13 @@ public class JobServiceImpl implements JobService {
             }
         }
 
+        Set<StageDTO> stageSet = new HashSet<>(jobDTO.getStages());
+
+        if (jobDTO.getStages().size() != stageSet.size()) {
+            throw new CustomException("Duplicate Stages dedicated");
+        }
+
         jobDTO.getStages().forEach(stageDTO -> {
-//          trying to prevent duplicate stages.
             Optional<Stage> stageOptional = stageRepository.findById(stageDTO.getId());
             if(stageOptional.isEmpty()){
                 try {

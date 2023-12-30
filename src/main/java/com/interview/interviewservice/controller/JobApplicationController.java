@@ -123,6 +123,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.PUT, value = "approve")
     public IDataResponse approveJobApplications(@RequestBody @NotEmpty List<Long> ids, @RequestParam("comment") String comment){
         IDataResponse dataResponse = new IDataResponse();
@@ -138,6 +139,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.PUT, value = "reject")
     public IDataResponse rejectJobApplications(@RequestBody @NotEmpty List<Long> ids, @RequestParam("comment") String comment){
         IDataResponse dataResponse = new IDataResponse();
@@ -153,6 +155,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.PUT, value = "approve"+BaseResource.RELATIVEPATH+"{jobApplicationId}")
     public IDataResponse approveJobApplication(@PathVariable("jobApplicationId") Long id, @RequestParam("comment") String comment){
         IDataResponse dataResponse = new IDataResponse();
@@ -170,6 +173,7 @@ public class JobApplicationController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.PUT, value = "reject"+BaseResource.RELATIVEPATH+"{jobApplicationId}")
     public IDataResponse rejectJobApplication(@PathVariable("jobApplicationId") Long id, @RequestParam("comment") String comment){
         IDataResponse dataResponse = new IDataResponse();

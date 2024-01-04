@@ -73,7 +73,8 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             jobApplication.setJob(job.get());
             jobApplication.setCandidate(candidate.get());
 
-            jobApplicationRepository.save(jobApplication);
+            JobApplication savedJobApplication = jobApplicationRepository.save(jobApplication);
+            jobApplicationProcessEmail(savedJobApplication);
         }
     }
 
@@ -239,7 +240,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         }
         
         if(Objects.isNull(jobApplicationDTO.getCandidateDTO())){
-            throw new CustomException("Job Info is required");
+            throw new CustomException("Candidate Info is required");
         }
 
         Optional<Candidate> candidate = candidateRepository.findById(jobApplicationDTO.getCandidateDTO().getId());
@@ -248,7 +249,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         }
         
         if(StringUtils.isEmpty(jobApplicationDTO.getCompanyId())){
-            throw new CustomException("Job Info is required");
+            throw new CustomException("Company Info is required");
         }
 
         Company company = companyRepository.findCompanyByCompanyId(jobApplicationDTO.getCompanyId());
@@ -260,7 +261,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             throw new CustomException("You still have an application for this job under review");
         }
     }
-    private void JobApplicationProcessEmail(JobApplicationDTO job){
+    private void jobApplicationProcessEmail(JobApplication job){
 
     }
 }

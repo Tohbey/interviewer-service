@@ -92,10 +92,6 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobDTO jobDtoMapper(Job job) {
         JobDTO jobDTO = jobMapper.jobToJobDTO(job);
-        job.getStages().forEach(stage -> {
-            StageDTO stageDTO = stageMapper.stageToStageDTO(stage);
-            jobDTO.getStages().add(stageDTO);
-        });
         jobDTO.setCompanyId(job.getCompany().getCompanyId());
         jobDTO.setDeadLine(job.getDeadline());
 

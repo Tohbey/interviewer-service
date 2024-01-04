@@ -11,7 +11,7 @@ public interface JobTicketService {
 
     JobTicketDTO find(Long jobTicketId) throws CustomException;
 
-    void update(JobTicketDTO jobTicketDTO);
+    void update(JobTicketDTO jobTicketDTO) throws CustomException;
 
     void delete(Long jobTicketDTO) throws CustomException;
 

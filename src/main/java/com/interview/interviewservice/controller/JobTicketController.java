@@ -22,6 +22,7 @@ public class JobTicketController {
         this.jobTicketService = jobTicketService;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createJobTicket(@RequestBody JobTicketDTO jobTicketDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -37,6 +38,7 @@ public class JobTicketController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{jobTicketId}")
     public IDataResponse findJobTicket(@PathVariable("jobTicketId") Long jobTicketId){
         IDataResponse dataResponse = new IDataResponse();
@@ -52,7 +54,7 @@ public class JobTicketController {
         return dataResponse;
     }
 
-
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{jobTicketId}")
     public IDataResponse deleteJobTicket(@PathVariable("jobTicketId") Long jobTicketId){
         IDataResponse dataResponse = new IDataResponse();
@@ -68,6 +70,7 @@ public class JobTicketController {
         return dataResponse;
     }
 
+    //  Test Completed✔
     @RequestMapping(method = RequestMethod.PUT, value = BaseResource.UPDATE)
     public IDataResponse updateJobTicket(@RequestBody JobTicketDTO jobTicketDTO){
         IDataResponse dataResponse = new IDataResponse();

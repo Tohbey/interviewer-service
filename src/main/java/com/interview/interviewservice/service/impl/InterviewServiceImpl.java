@@ -3,16 +3,18 @@ package com.interview.interviewservice.service.impl;
 import com.interview.interviewservice.Util.CustomException;
 import com.interview.interviewservice.entity.*;
 import com.interview.interviewservice.mapper.DTOS.InterviewDTO;
+import com.interview.interviewservice.mapper.DTOS.JobTicketDTO;
 import com.interview.interviewservice.mapper.mappers.InterviewMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.*;
+import com.interview.interviewservice.service.CandidateService;
 import com.interview.interviewservice.service.InterviewService;
+import com.interview.interviewservice.service.JobService;
+import com.interview.interviewservice.service.UserContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class InterviewServiceImpl implements InterviewService {
@@ -31,10 +33,15 @@ public class InterviewServiceImpl implements InterviewService {
 
     private final InterviewMapper interviewMapper;
 
+    private final UserContextService userContextService;
+
+    @Autowired
+    private CandidateService candidateService;
+
     public InterviewServiceImpl(InterviewRepository interviewRepository, TeamRepository teamRepository, StageRepository stageRepository,
                                 CompanyRepository companyRepository,
                                 JobRepository jobRepository,
-                                CandidateRepository candidateRepository, InterviewMapper interviewMapper) {
+                                CandidateRepository candidateRepository, InterviewMapper interviewMapper, UserContextService userContextService) {
         this.interviewRepository = interviewRepository;
         this.teamRepository = teamRepository;
         this.stageRepository = stageRepository;
@@ -42,12 +49,13 @@ public class InterviewServiceImpl implements InterviewService {
         this.jobRepository = jobRepository;
         this.candidateRepository = candidateRepository;
         this.interviewMapper = interviewMapper;
+        this.userContextService = userContextService;
     }
 
     @Override
     public void create(InterviewDTO interviewDTO) throws CustomException {
         validate(interviewDTO);
-        Interview interview = interviewMapper.interviewDTOToInterview(interviewDTO);
+        Interview interview = mapper(interviewDTO);
         interview.setFlag(Flag.ENABLED);
         Company company = companyRepository.findCompanyByCompanyId(interviewDTO.getCompanyId());
         interview.setCompany(company);
@@ -61,7 +69,7 @@ public class InterviewServiceImpl implements InterviewService {
         if(interview.isPresent()) {
             InterviewDTO interviewDTO = interviewMapper.interviewToInterviewDTO(interview.get());
             interviewDTO.setCompanyId(interview.get().getCompany().getCompanyId());
-
+            interviewDTO.setCandidate(candidateService.candidateDtoMapper(interview.get().getCandidate()));
             return interviewDTO;
         }else{
             throw new CustomException("Interview details not found");
@@ -84,7 +92,7 @@ public class InterviewServiceImpl implements InterviewService {
         Optional<Interview> savedInterview = interviewRepository.findById(interviewDTO.getId());
         if(savedInterview.isPresent()) {
             validateUpdate(interviewDTO,savedInterview.get());
-            Interview interview = interviewMapper.interviewDTOToInterview(interviewDTO);
+            Interview interview = mapper(interviewDTO);
 
             interviewRepository.save(interview);
         }else{
@@ -103,6 +111,7 @@ public class InterviewServiceImpl implements InterviewService {
             interviews.forEach(interview -> {
                 InterviewDTO interviewDTO = interviewMapper.interviewToInterviewDTO(interview);
                 interviewDTO.setCompanyId(interview.getCompany().getCompanyId());
+                interviewDTO.setCandidate(candidateService.candidateDtoMapper(interview.getCandidate()));
                 interviewDTOS.add(interviewDTO);
             });
 
@@ -158,20 +167,28 @@ public class InterviewServiceImpl implements InterviewService {
             throw new CustomException("Company details not found");
         }
 
+        if(Objects.isNull(interviewDTO.getTeam())){throw new CustomException("Team details cant be null");}
+
         Optional<Team> team = teamRepository.findById(interviewDTO.getTeam().getId());
         if(team.isEmpty()){
             throw new CustomException("Team details not found");
         }
+
+        if(Objects.isNull(interviewDTO.getStage())){throw new CustomException("Stage details cant be null");}
 
         Optional<Stage> stage = stageRepository.findById(interviewDTO.getStage().getId());
         if(stage.isEmpty()){
             throw new CustomException("Stage details not found");
         }
 
+        if(Objects.isNull(interviewDTO.getJob())){throw new CustomException("Stage details cant be null");}
+
         Optional<Job> job = jobRepository.findById(interviewDTO.getJob().getId());
         if(job.isEmpty()){
             throw new CustomException("Job details not found");
         }
+
+        if(Objects.isNull(interviewDTO.getCandidate())){throw new CustomException("Stage details cant be null");}
 
         Optional<Candidate> candidate = candidateRepository.findById(interviewDTO.getCandidate().getId());
         if(candidate.isEmpty()){
@@ -187,10 +204,12 @@ public class InterviewServiceImpl implements InterviewService {
 
     private void validateUpdate(InterviewDTO interviewDTO, Interview savedInterview) throws CustomException {
         Company company =  companyRepository.findCompanyByCompanyId(interviewDTO.getCompanyId());
-        if(!savedInterview.equals(company)){
-            if(Objects.isNull(company)){
+        if(Objects.nonNull(company)) {
+            if(!savedInterview.getCompany().equals(company)){
                 throw new CustomException("Company details not found");
             }
+        }else{
+            throw new CustomException("Company details not found");
         }
 
         Optional<Team> team = teamRepository.findById(interviewDTO.getTeam().getId());
@@ -218,6 +237,18 @@ public class InterviewServiceImpl implements InterviewService {
                 throw new CustomException("There is a current open interview for this candidate");
             }
         }
+    }
 
+    private Interview mapper(InterviewDTO interviewDTO) throws CustomException {
+        Interview interview = interviewMapper.interviewDTOToInterview(interviewDTO);
+        if(Objects.isNull(interview.getId())){
+            interview.setCreatedDate(new Date());
+            interview.setCreatedBy(userContextService.getCurrentUserDTO().getFullname());
+        }else{
+            interview.setLastModifiedDate(new Date());
+            interview.setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
+        }
+
+        return interview;
     }
 }

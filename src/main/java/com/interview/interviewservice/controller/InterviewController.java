@@ -23,6 +23,7 @@ public class InterviewController {
         this.interviewService = interviewService;
     }
 
+//  Testing Completed.
     @RequestMapping(method = RequestMethod.POST, value = BaseResource.SAVE)
     public IDataResponse createInterview(@RequestBody InterviewDTO interviewDTO){
         IDataResponse dataResponse = new IDataResponse();
@@ -38,6 +39,7 @@ public class InterviewController {
         return dataResponse;
     }
 
+//  Testing Completed.
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.FIND+BaseResource.RELATIVEPATH+"{interviewId}")
     public IDataResponse findInterview(@PathVariable("interviewId") Long interviewId){
         IDataResponse dataResponse = new IDataResponse();
@@ -53,6 +55,7 @@ public class InterviewController {
         return dataResponse;
     }
 
+//  Testing Completed.
     @RequestMapping(method = RequestMethod.DELETE, value = BaseResource.DELETE+BaseResource.RELATIVEPATH+"{interviewId}")
     public IDataResponse deleteInterview(@PathVariable("interviewId") Long interviewId){
         IDataResponse dataResponse = new IDataResponse();

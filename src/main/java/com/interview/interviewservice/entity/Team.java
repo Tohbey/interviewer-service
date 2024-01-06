@@ -3,6 +3,7 @@ package com.interview.interviewservice.entity;
 import com.interview.interviewservice.entity.core.FlagableAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 @Data

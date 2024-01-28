@@ -82,7 +82,7 @@ public class ElasticSynchronizer {
 
         for(User user: userList){
             int i = 0;
-            UserModel userModel = new UserModel(user.getId(), user.getSurname(), user.getOtherNames(), user.getCompany().getCompanyId());
+            UserModel userModel = new UserModel(user.getId(), user.getSurname(), user.getOtherNames(), user.getCompany().getCompanyId(),"");
             logger.info("Syncing Users - {}", i);
             iUserERepo.save(userModel);
             i+=1;

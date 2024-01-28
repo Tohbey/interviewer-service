@@ -1,10 +1,13 @@
 package com.interview.interviewservice.service.impl;
 
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
 import com.interview.interviewservice.Util.ResultQuery;
 import com.interview.interviewservice.controller.AuthenticationController;
+import com.interview.interviewservice.dtos.ElasticSearchResponse;
 import com.interview.interviewservice.elastic.UserModel;
 import com.interview.interviewservice.entity.*;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
@@ -24,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -333,12 +337,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResultQuery userSearch(String query, String companyId) throws IOException {
+    public List<KeyValuePair> userSearch(String query, String companyId) throws Exception {
+        List<KeyValuePair> results = new ArrayList<>();
         String[] USER_FIELDS = {"otherNames", "surname"};
         ResultQuery resultQuery = iSearchService.searchFromQuery(query, USER_FIELDS, "user/", companyId);
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<UserModel> userModels = objectMapper.readValue(resultQuery.getElements(), new TypeReference<List<UserModel>>() {});
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ElasticSearchResponse<UserModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                    new TypeReference<List<ElasticSearchResponse<UserModel>>>() {});
 
-        return resultQuery;
+            if(!elasticSearchResponses.isEmpty()){
+                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
+                    UserModel userModel = (UserModel) elasticSearchResponse.getSource();
+                    KeyValuePair keyValuePair = new KeyValuePair(userModel.getId(), userModel.getSurname()+" "+userModel.getOtherNames());
+                    results.add(keyValuePair);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+
+        return results;
     }
 }

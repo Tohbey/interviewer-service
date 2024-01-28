@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
 import com.interview.interviewservice.Util.ResultQuery;
 import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.entity.User;
@@ -27,5 +28,5 @@ public interface UserService {
 
     List<UserDTO> findUsersByTeam(Team team);
 
-    ResultQuery userSearch(String query, String companyId) throws IOException;
+    List<KeyValuePair> userSearch(String query, String companyId) throws Exception;
 }

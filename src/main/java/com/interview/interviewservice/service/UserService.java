@@ -1,12 +1,14 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.ResultQuery;
 import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.entity.User;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
 import com.interview.interviewservice.model.Flag;
 import jakarta.mail.MessagingException;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -24,4 +26,6 @@ public interface UserService {
     UserDTO mapper(User user);
 
     List<UserDTO> findUsersByTeam(Team team);
+
+    ResultQuery userSearch(String query, String companyId) throws IOException;
 }

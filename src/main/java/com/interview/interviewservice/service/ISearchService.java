@@ -5,5 +5,5 @@ import com.interview.interviewservice.Util.ResultQuery;
 import java.io.IOException;
 
 public interface ISearchService {
-    ResultQuery searchFromQuery(String query, String[] fields) throws IOException;
+    ResultQuery searchFromQuery(String query, String[] fields, String className, String companyId) throws IOException;
 }

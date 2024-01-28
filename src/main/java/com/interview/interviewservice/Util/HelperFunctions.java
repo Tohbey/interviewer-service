@@ -6,26 +6,26 @@ import java.util.Arrays;
 
 public class HelperFunctions {
 
-    public static String buildMultiIndexMatchBody(String query, String[] fields) {
+    public static String buildMultiIndexMatchBody(String query, String[] fields, String companyId) {
         return "{\n" +
-                "\"from\": 0,\n" +
-                "\"size\": 100,\n" +
-                "\"track_total_hits\": true,\n" +
-                "\"sort\" : {\n" +
-                "      \"id\": {\"order\": \"asc\"}\n" +
-                "      },\n" +
                 "  \"query\": {\n" +
-                "    \"query_string\" : {\n" +
-                "      \"query\":      \"*" + query + "*\",\n" +
-                "      \"fields\":     " + new JSONArray(Arrays.asList(fields)) + ",\n" +
-                "      \"default_operator\": \"AND\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"highlight\": {\n" +
-                "    \"fields\": {\n" +
-                "      \"*\": {}\n" +
-                "    },\n" +
-                "    \"require_field_match\": true\n" +
+                "    \"bool\" : {\n" +
+                "       \"must\" : [\n" +
+                "          {\n" +
+                "             \"query_string\" : {\n" +
+                "                \"query\": \"*" + query + "*\",\n" +
+                "                \"fields\":" + new JSONArray(Arrays.asList(fields)) + ",\n" +
+                "                \"default_operator\": \"OR\"\n" +
+                "             }\n" +
+                "           },\n" +
+                "          {\n" +
+                "             \"term\" : " +
+                "             {\n" +
+                "                \"companyId\": "+ companyId + "\n" +
+                "             }\n" +
+                "           }\n" +
+                "       ]\n" +
+                "   }\n" +
                 " }\n" +
                 "}";
     }

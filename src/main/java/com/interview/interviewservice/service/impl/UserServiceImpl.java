@@ -1,7 +1,11 @@
 package com.interview.interviewservice.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.ResultQuery;
 import com.interview.interviewservice.controller.AuthenticationController;
+import com.interview.interviewservice.elastic.UserModel;
 import com.interview.interviewservice.entity.*;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.mapper.DTOS.UserDTO;
@@ -10,6 +14,7 @@ import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.mapper.mappers.UserMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.*;
+import com.interview.interviewservice.service.ISearchService;
 import com.interview.interviewservice.service.MailSender;
 import com.interview.interviewservice.service.UserContextService;
 import com.interview.interviewservice.service.UserService;
@@ -23,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -42,6 +48,8 @@ public class UserServiceImpl implements UserService {
     private final TeamMapper teamMapper;
 
     private final TokenRepository tokenRepository;
+
+    private final ISearchService iSearchService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -65,7 +73,7 @@ public class UserServiceImpl implements UserService {
                            RoleMapper roleMapper,
                            TeamRepository teamRepository,
                            TeamMapper teamMapper,
-                           TokenRepository tokenRepository,
+                           TokenRepository tokenRepository, ISearchService iSearchService,
                            UserContextService userContextService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -75,6 +83,7 @@ public class UserServiceImpl implements UserService {
         this.teamRepository = teamRepository;
         this.teamMapper = teamMapper;
         this.tokenRepository = tokenRepository;
+        this.iSearchService = iSearchService;
         this.userContextService = userContextService;
     }
 
@@ -321,5 +330,15 @@ public class UserServiceImpl implements UserService {
         verifyToken.setExpiredAt(expiredAt);
 
         return tokenRepository.save(verifyToken);
+    }
+
+    @Override
+    public ResultQuery userSearch(String query, String companyId) throws IOException {
+        String[] USER_FIELDS = {"otherNames", "surname"};
+        ResultQuery resultQuery = iSearchService.searchFromQuery(query, USER_FIELDS, "user/", companyId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<UserModel> userModels = objectMapper.readValue(resultQuery.getElements(), new TypeReference<List<UserModel>>() {});
+
+        return resultQuery;
     }
 }

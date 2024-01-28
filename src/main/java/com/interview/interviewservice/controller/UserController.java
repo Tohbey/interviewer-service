@@ -84,4 +84,18 @@ public class UserController {
         }
         return dataResponse;
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.SEARCH+BaseResource.RELATIVEPATH+"{companyId}")
+    public IDataResponse searchUser(@RequestParam("query") String query, @PathVariable("companyId") String companyId){
+        IDataResponse dataResponse = new IDataResponse();
+        try {
+            dataResponse.setData(Collections.singletonList(userService.userSearch(query, companyId)));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("User Successfully Updated","Deleted", Message.Severity.SUCCESS));
+        }catch (Exception e) {
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
 }

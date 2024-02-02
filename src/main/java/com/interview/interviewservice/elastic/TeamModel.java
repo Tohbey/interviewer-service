@@ -1,5 +1,6 @@
 package com.interview.interviewservice.elastic;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,4 +25,7 @@ public class TeamModel {
 
     @Field(type = FieldType.Text, name = "companyId")
     private String companyId;
+
+    @JsonIgnore
+    private String _class;
 }

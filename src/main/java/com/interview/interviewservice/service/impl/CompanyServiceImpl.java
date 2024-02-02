@@ -148,23 +148,25 @@ public class CompanyServiceImpl implements CompanyService {
         List<KeyValuePair> results = new ArrayList<>();
         String[] COMPANY_FIELDS = {"companyName", "country"};
         ResultQuery resultQuery = iSearchService.searchFromQuery(query, COMPANY_FIELDS, "company/", "");
-        try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<ElasticSearchResponse<CompanyModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
-                    new TypeReference<List<ElasticSearchResponse<CompanyModel>>>() {});
+        if(Objects.nonNull(resultQuery.getElements())) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<ElasticSearchResponse<CompanyModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                        new TypeReference<List<ElasticSearchResponse<CompanyModel>>>() {
+                        });
 
-            if(!elasticSearchResponses.isEmpty()){
-                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
-                    CompanyModel companyModel = (CompanyModel) elasticSearchResponse.getSource();
-                    KeyValuePair keyValuePair = new KeyValuePair(companyModel.getId(), companyModel.getCompanyName()+" ("+companyModel.getCountry()+")");
-                    results.add(keyValuePair);
+                if (!elasticSearchResponses.isEmpty()) {
+                    for (ElasticSearchResponse elasticSearchResponse : elasticSearchResponses) {
+                        CompanyModel companyModel = (CompanyModel) elasticSearchResponse.getSource();
+                        KeyValuePair keyValuePair = new KeyValuePair(companyModel.getId(), companyModel.getCompanyName() + " (" + companyModel.getCountry() + ")");
+                        results.add(keyValuePair);
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception(e.getMessage());
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new Exception(e.getMessage());
         }
-
         return results;
     }
 

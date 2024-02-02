@@ -149,7 +149,7 @@ public class CompanyController {
         try {
             dataResponse.setData(jobService.findJobsByCompany(companyId, flag));
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("Stages Successfully Retrieved","Retrieved", Message.Severity.INFO));
+            dataResponse.addMessage(new GlobalMessage("Job Successfully Retrieved","Retrieved", Message.Severity.INFO));
         }catch (Exception e) {
             e.printStackTrace();
             dataResponse.setValid(false);
@@ -164,7 +164,7 @@ public class CompanyController {
         try {
             dataResponse.setData(Collections.singletonList(companyService.companySearch(query)));
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("User Successfully Updated","Deleted", Message.Severity.SUCCESS));
+            dataResponse.addMessage(new GlobalMessage("Company Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
         }catch (Exception e) {
             dataResponse.setValid(false);
             dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));

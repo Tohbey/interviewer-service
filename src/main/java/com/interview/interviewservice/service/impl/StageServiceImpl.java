@@ -130,23 +130,25 @@ public class StageServiceImpl implements StageService {
         List<KeyValuePair> results = new ArrayList<>();
         String[] STAGE_FIELDS = {"description"};
         ResultQuery resultQuery = iSearchService.searchFromQuery(query, STAGE_FIELDS, "stage/", companyId);
-        try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<ElasticSearchResponse<StageModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
-                    new TypeReference<List<ElasticSearchResponse<StageModel>>>() {});
+        if(Objects.nonNull(resultQuery.getElements())){
+            try{
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<ElasticSearchResponse<StageModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                        new TypeReference<List<ElasticSearchResponse<StageModel>>>() {});
 
-            if(!elasticSearchResponses.isEmpty()){
-                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
-                    StageModel stageModel = (StageModel) elasticSearchResponse.getSource();
-                    KeyValuePair keyValuePair = new KeyValuePair(stageModel.getId(), stageModel.getDescription());
-                    results.add(keyValuePair);
+                if(!elasticSearchResponses.isEmpty()){
+                    for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
+                        StageModel stageModel = (StageModel) elasticSearchResponse.getSource();
+                        KeyValuePair keyValuePair = new KeyValuePair(stageModel.getId(), stageModel.getDescription());
+                        results.add(keyValuePair);
+                    }
                 }
+            }catch (Exception e){
+                e.printStackTrace();
+                throw new Exception(e.getMessage());
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new Exception(e.getMessage());
-        }
 
+        }
         return results;
     }
 

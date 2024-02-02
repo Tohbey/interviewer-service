@@ -175,21 +175,24 @@ public class JobServiceImpl implements JobService {
         List<KeyValuePair> results = new ArrayList<>();
         String[] JOB_FIELDS = {"title", "section", "location", "country"};
         ResultQuery resultQuery = iSearchService.searchFromQuery(query, JOB_FIELDS, "job/", companyId);
-        try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<ElasticSearchResponse<JobModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
-                    new TypeReference<List<ElasticSearchResponse<JobModel>>>() {});
+        if(Objects.nonNull(resultQuery.getElements())) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<ElasticSearchResponse<JobModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                        new TypeReference<List<ElasticSearchResponse<JobModel>>>() {
+                        });
 
-            if(!elasticSearchResponses.isEmpty()){
-                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
-                    JobModel jobModel = (JobModel) elasticSearchResponse.getSource();
-                    KeyValuePair keyValuePair = new KeyValuePair(jobModel.getId(), jobModel.getTitle()+" "+jobModel.getSection());
-                    results.add(keyValuePair);
+                if (!elasticSearchResponses.isEmpty()) {
+                    for (ElasticSearchResponse elasticSearchResponse : elasticSearchResponses) {
+                        JobModel jobModel = (JobModel) elasticSearchResponse.getSource();
+                        KeyValuePair keyValuePair = new KeyValuePair(jobModel.getId(), jobModel.getTitle() + " " + jobModel.getSection());
+                        results.add(keyValuePair);
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception(e.getMessage());
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new Exception(e.getMessage());
         }
         return results;
     }

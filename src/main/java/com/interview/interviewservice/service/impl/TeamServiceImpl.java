@@ -255,22 +255,25 @@ public class TeamServiceImpl implements TeamService {
     public List<KeyValuePair> teamSearch(String query, String companyId) throws Exception {
         List<KeyValuePair> results = new ArrayList<>();
         String[] STAGE_FIELDS = {"name", "section"};
-        ResultQuery resultQuery = iSearchService.searchFromQuery(query, STAGE_FIELDS, "stage/", companyId);
-        try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<ElasticSearchResponse<TeamModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
-                    new TypeReference<List<ElasticSearchResponse<TeamModel>>>() {});
+        ResultQuery resultQuery = iSearchService.searchFromQuery(query, STAGE_FIELDS, "team/", companyId);
+        if(Objects.nonNull(resultQuery.getElements())) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<ElasticSearchResponse<TeamModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                        new TypeReference<List<ElasticSearchResponse<TeamModel>>>() {
+                        });
 
-            if(!elasticSearchResponses.isEmpty()){
-                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
-                    TeamModel teamModel = (TeamModel) elasticSearchResponse.getSource();
-                    KeyValuePair keyValuePair = new KeyValuePair(teamModel.getId(), teamModel.getName().concat(" (").concat(teamModel.getSection()).concat(")"));
-                    results.add(keyValuePair);
+                if (!elasticSearchResponses.isEmpty()) {
+                    for (ElasticSearchResponse elasticSearchResponse : elasticSearchResponses) {
+                        TeamModel teamModel = (TeamModel) elasticSearchResponse.getSource();
+                        KeyValuePair keyValuePair = new KeyValuePair(teamModel.getId(), teamModel.getName().concat(" (").concat(teamModel.getSection()).concat(")"));
+                        results.add(keyValuePair);
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception(e.getMessage());
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new Exception(e.getMessage());
         }
 
         return results;

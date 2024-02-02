@@ -1,5 +1,6 @@
 package com.interview.interviewservice.Util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 
 import java.util.Arrays;
@@ -17,19 +18,22 @@ public class HelperFunctions {
                 "                \"fields\":" + new JSONArray(Arrays.asList(fields)) + ",\n" +
                 "                \"default_operator\": \"OR\"\n" +
                 "             }\n" +
-                "           },\n" +
-                "          {\n" +
-                "             \"term\" : " +
-                "             {\n" +
-                "                \"companyId\": "+ companyId + "\n" +
-                "             }\n" +
                 "           }\n" +
+                additionOfCompanyQuery(companyId) +
                 "       ]\n" +
                 "   }\n" +
                 " }\n" +
                 "}";
     }
 
+    private static String additionOfCompanyQuery(String companyId){
+        return StringUtils.isEmpty(companyId) ? "" : ",{\n" +
+                "             \"term\" : " +
+                "             {\n" +
+                "                \"companyId\": "+ companyId + "\n" +
+                "             }\n" +
+                "           }\n" ;
+    }
     public static String buildSearchUri(String elasticSearchUri,
                                         String elasticSearchIndex,
                                         String elasticSearchSearch) {

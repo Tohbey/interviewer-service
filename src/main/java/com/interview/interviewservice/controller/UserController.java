@@ -91,7 +91,7 @@ public class UserController {
         try {
             dataResponse.setData(Collections.singletonList(userService.userSearch(query, companyId)));
             dataResponse.setValid(true);
-            dataResponse.addMessage(new GlobalMessage("User Successfully Updated","Deleted", Message.Severity.SUCCESS));
+            dataResponse.addMessage(new GlobalMessage("User Successfully Retrieved","Retrieved", Message.Severity.SUCCESS));
         }catch (Exception e) {
             dataResponse.setValid(false);
             dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));

@@ -22,6 +22,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Date;
+import java.util.Objects;
+
 @Service
 public class ElasticSynchronizer {
 
@@ -57,7 +59,7 @@ public class ElasticSynchronizer {
 
     private static final Logger logger = LoggerFactory.getLogger(ElasticSynchronizer.class);
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "* * * * * *")
     @Transactional
     public void sync(){
         logger.info("Start Syncing - {}", LocalDateTime.now());
@@ -82,7 +84,8 @@ public class ElasticSynchronizer {
 
         for(User user: userList){
             int i = 0;
-            UserModel userModel = new UserModel(user.getId(), user.getSurname(), user.getOtherNames(), user.getCompany().getCompanyId(),"");
+            UserModel userModel = new UserModel(user.getId(), user.getSurname(), user.getOtherNames(), Objects.nonNull(user.getCompany()) ?
+                    user.getCompany().getCompanyId(): null ,"");
             logger.info("Syncing Users - {}", i);
             iUserERepo.save(userModel);
             i+=1;
@@ -103,7 +106,7 @@ public class ElasticSynchronizer {
         for(Job job: jobs){
             int i = 0;
             JobModel jobModel = new JobModel(job.getId(), job.getTitle(), job.getJobId(),
-                    job.getSection(), job.getLocation(), job.getCountry(), job.getCompany().getCompanyId());
+                    job.getSection(), job.getDescription(),job.getLocation(), job.getCountry(), job.getCompany().getCompanyId(), "");
             logger.info("Syncing Job - {}", i);
             iJobERepo.save(jobModel);
             i+=1;
@@ -123,7 +126,7 @@ public class ElasticSynchronizer {
 
         for(Stage stage: stages){
             int i = 0;
-            StageModel stageModel = new StageModel(stage.getId(), stage.getDescription(), stage.getCompany().getCompanyId());
+            StageModel stageModel = new StageModel(stage.getId(), stage.getDescription(), stage.getCompany().getCompanyId(), "");
             logger.info("Syncing Stage - {}", i);
             iStageERepo.save(stageModel);
             i+=1;
@@ -143,7 +146,7 @@ public class ElasticSynchronizer {
 
         for(Team team: teams){
             int i = 0;
-            TeamModel teamModel = new TeamModel(team.getId(), team.getName(), team.getSection(), team.getCompany().getCompanyId());
+            TeamModel teamModel = new TeamModel(team.getId(), team.getName(), team.getSection(), team.getCompany().getCompanyId(), "");
             logger.info("Syncing Team - {}", i);
             iTeamERepo.save(teamModel);
             i+=1;
@@ -163,7 +166,7 @@ public class ElasticSynchronizer {
 
         for(Company company: companies){
             int i = 0;
-            CompanyModel companyModel = new CompanyModel(company.getId(), company.getCompanyName(), company.getCountry());
+            CompanyModel companyModel = new CompanyModel(company.getId(), company.getCompanyName(), company.getCountry(), "");
             logger.info("Syncing Company - {}", i);
             iCompanyERepo.save(companyModel);
             i+=1;

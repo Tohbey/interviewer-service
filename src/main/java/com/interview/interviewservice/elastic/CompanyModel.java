@@ -1,6 +1,7 @@
 package com.interview.interviewservice.elastic;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,7 @@ public class CompanyModel {
 
     @Field(type = FieldType.Text, name = "country")
     private String country;
+
+    @JsonIgnore
+    private String _class;
 }

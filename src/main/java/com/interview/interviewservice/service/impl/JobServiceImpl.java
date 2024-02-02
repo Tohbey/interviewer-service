@@ -1,6 +1,13 @@
 package com.interview.interviewservice.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
+import com.interview.interviewservice.Util.ResultQuery;
+import com.interview.interviewservice.dtos.ElasticSearchResponse;
+import com.interview.interviewservice.elastic.JobModel;
+import com.interview.interviewservice.elastic.UserModel;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Job;
 import com.interview.interviewservice.entity.Stage;
@@ -12,10 +19,12 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.JobRepository;
 import com.interview.interviewservice.repository.StageRepository;
+import com.interview.interviewservice.service.ISearchService;
 import com.interview.interviewservice.service.JobService;
 import com.interview.interviewservice.service.UserContextService;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -35,6 +44,9 @@ public class JobServiceImpl implements JobService {
     private final StageMapper  stageMapper;
 
     private final UserContextService userContextService;
+
+    @Autowired
+    private ISearchService iSearchService;
 
 
     public JobServiceImpl(JobRepository jobRepository,
@@ -156,6 +168,30 @@ public class JobServiceImpl implements JobService {
         }else{
             throw new CustomException("Company Details not found");
         }
+    }
+
+    @Override
+    public List<KeyValuePair> jobSearch(String query, String companyId) throws Exception {
+        List<KeyValuePair> results = new ArrayList<>();
+        String[] JOB_FIELDS = {"title", "section", "location", "country"};
+        ResultQuery resultQuery = iSearchService.searchFromQuery(query, JOB_FIELDS, "job/", companyId);
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ElasticSearchResponse<JobModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                    new TypeReference<List<ElasticSearchResponse<JobModel>>>() {});
+
+            if(!elasticSearchResponses.isEmpty()){
+                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
+                    JobModel jobModel = (JobModel) elasticSearchResponse.getSource();
+                    KeyValuePair keyValuePair = new KeyValuePair(jobModel.getId(), jobModel.getTitle()+" "+jobModel.getSection());
+                    results.add(keyValuePair);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+        return results;
     }
 
     private void validate(JobDTO jobDTO) throws CustomException {

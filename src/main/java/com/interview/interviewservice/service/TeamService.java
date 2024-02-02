@@ -1,8 +1,11 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
 import com.interview.interviewservice.dtos.TeamMemberAndInvite;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
+
+import java.util.List;
 
 public interface TeamService {
 
@@ -17,4 +20,7 @@ public interface TeamService {
     void addTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws CustomException;
 
     void removeTeamMembersAndInvitesByTeam(Long teamId, TeamMemberAndInvite teamMemberAndInvite) throws CustomException;
+
+    List<KeyValuePair> teamSearch(String query, String companyId) throws Exception;
+
 }

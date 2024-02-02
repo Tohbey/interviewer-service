@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
 import com.interview.interviewservice.entity.Job;
 import com.interview.interviewservice.mapper.DTOS.JobDTO;
 import com.interview.interviewservice.model.Flag;
@@ -21,4 +22,7 @@ public interface JobService {
     void delete(Long jobId) throws CustomException;
 
     List<JobDTO> findJobsByCompany(String companyId, Flag flag) throws CustomException;
+
+    List<KeyValuePair> jobSearch(String query, String companyId) throws Exception;
+
 }

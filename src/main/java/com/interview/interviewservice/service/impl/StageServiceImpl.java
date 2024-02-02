@@ -1,6 +1,13 @@
 package com.interview.interviewservice.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
+import com.interview.interviewservice.Util.ResultQuery;
+import com.interview.interviewservice.dtos.ElasticSearchResponse;
+import com.interview.interviewservice.elastic.StageModel;
+import com.interview.interviewservice.elastic.UserModel;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Stage;
 import com.interview.interviewservice.mapper.DTOS.StageDTO;
@@ -9,8 +16,10 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.StageRepository;
 import com.interview.interviewservice.service.AuthenticationService;
+import com.interview.interviewservice.service.ISearchService;
 import com.interview.interviewservice.service.StageService;
 import com.interview.interviewservice.service.UserContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,6 +34,10 @@ public class StageServiceImpl implements StageService {
     private final CompanyRepository companyRepository;
 
     private final UserContextService userContextService;
+
+    @Autowired
+    private ISearchService iSearchService;
+
 
     public StageServiceImpl(StageRepository stageRepository,
                             StageMapper stageMapper,
@@ -110,6 +123,31 @@ public class StageServiceImpl implements StageService {
         });
 
         return stageDTOS;
+    }
+
+    @Override
+    public List<KeyValuePair> stageSearch(String query, String companyId) throws Exception {
+        List<KeyValuePair> results = new ArrayList<>();
+        String[] STAGE_FIELDS = {"description"};
+        ResultQuery resultQuery = iSearchService.searchFromQuery(query, STAGE_FIELDS, "stage/", companyId);
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ElasticSearchResponse<StageModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                    new TypeReference<List<ElasticSearchResponse<StageModel>>>() {});
+
+            if(!elasticSearchResponses.isEmpty()){
+                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
+                    StageModel stageModel = (StageModel) elasticSearchResponse.getSource();
+                    KeyValuePair keyValuePair = new KeyValuePair(stageModel.getId(), stageModel.getDescription());
+                    results.add(keyValuePair);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+
+        return results;
     }
 
     private void validate(StageDTO stageDTO) throws CustomException {

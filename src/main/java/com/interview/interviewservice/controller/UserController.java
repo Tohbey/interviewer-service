@@ -86,7 +86,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = BaseResource.SEARCH+BaseResource.RELATIVEPATH+"{companyId}")
-    public IDataResponse searchUser(@RequestParam("query") String query, @PathVariable("companyId") String companyId){
+    public IDataResponse search(@RequestParam("query") String query, @PathVariable("companyId") String companyId){
         IDataResponse dataResponse = new IDataResponse();
         try {
             dataResponse.setData(Collections.singletonList(userService.userSearch(query, companyId)));

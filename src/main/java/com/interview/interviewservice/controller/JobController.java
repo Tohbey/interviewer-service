@@ -125,4 +125,18 @@ public class JobController {
         }
         return dataResponse;
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.SEARCH+BaseResource.RELATIVEPATH+"{companyId}")
+    public IDataResponse search(@RequestParam("query") String query, @PathVariable("companyId") String companyId){
+        IDataResponse dataResponse = new IDataResponse();
+        try {
+            dataResponse.setData(Collections.singletonList(jobService.jobSearch(query, companyId)));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("User Successfully Updated","Deleted", Message.Severity.SUCCESS));
+        }catch (Exception e) {
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
 }

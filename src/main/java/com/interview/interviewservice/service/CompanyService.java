@@ -1,6 +1,7 @@
 package com.interview.interviewservice.service;
 
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
 import com.interview.interviewservice.mapper.DTOS.CompanyDTO;
 import com.interview.interviewservice.mapper.DTOS.TeamDTO;
 import com.interview.interviewservice.model.Flag;
@@ -19,4 +20,6 @@ public interface CompanyService {
     void update(CompanyDTO companyDTO) throws CustomException;
 
     List<TeamDTO> findTeamsByCompany(String companyId) throws CustomException;
+
+    List<KeyValuePair> companySearch(String query) throws Exception;
 }

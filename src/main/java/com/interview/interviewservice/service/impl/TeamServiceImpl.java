@@ -1,7 +1,14 @@
 package com.interview.interviewservice.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
+import com.interview.interviewservice.Util.ResultQuery;
+import com.interview.interviewservice.dtos.ElasticSearchResponse;
 import com.interview.interviewservice.dtos.TeamMemberAndInvite;
+import com.interview.interviewservice.elastic.StageModel;
+import com.interview.interviewservice.elastic.TeamModel;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Invites;
 import com.interview.interviewservice.entity.Team;
@@ -17,13 +24,11 @@ import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.repository.UserRepository;
 import com.interview.interviewservice.service.*;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TeamServiceImpl implements TeamService {
@@ -40,6 +45,9 @@ public class TeamServiceImpl implements TeamService {
     private final InvitesService invitesService;
 
     private final UserContextService userContextService;
+
+    @Autowired
+    private ISearchService iSearchService;
 
     public TeamServiceImpl(TeamRepository teamRepository,
                            TeamMapper teamMapper,
@@ -241,6 +249,31 @@ public class TeamServiceImpl implements TeamService {
         }else{
             throw new CustomException("Team Not Found");
         }
+    }
+
+    @Override
+    public List<KeyValuePair> teamSearch(String query, String companyId) throws Exception {
+        List<KeyValuePair> results = new ArrayList<>();
+        String[] STAGE_FIELDS = {"name", "section"};
+        ResultQuery resultQuery = iSearchService.searchFromQuery(query, STAGE_FIELDS, "stage/", companyId);
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ElasticSearchResponse<TeamModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                    new TypeReference<List<ElasticSearchResponse<TeamModel>>>() {});
+
+            if(!elasticSearchResponses.isEmpty()){
+                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
+                    TeamModel teamModel = (TeamModel) elasticSearchResponse.getSource();
+                    KeyValuePair keyValuePair = new KeyValuePair(teamModel.getId(), teamModel.getName().concat(" (").concat(teamModel.getSection()).concat(")"));
+                    results.add(keyValuePair);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+
+        return results;
     }
 
     private void validation(TeamDTO teamDTO) throws CustomException{

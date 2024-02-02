@@ -1,6 +1,13 @@
 package com.interview.interviewservice.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.interviewservice.Util.CustomException;
+import com.interview.interviewservice.Util.KeyValuePair;
+import com.interview.interviewservice.Util.ResultQuery;
+import com.interview.interviewservice.dtos.ElasticSearchResponse;
+import com.interview.interviewservice.elastic.CompanyModel;
+import com.interview.interviewservice.elastic.UserModel;
 import com.interview.interviewservice.entity.Company;
 import com.interview.interviewservice.entity.Team;
 import com.interview.interviewservice.mapper.DTOS.*;
@@ -10,10 +17,7 @@ import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.model.RoleEnum;
 import com.interview.interviewservice.repository.CompanyRepository;
 import com.interview.interviewservice.repository.TeamRepository;
-import com.interview.interviewservice.service.CompanyService;
-import com.interview.interviewservice.service.InvitesService;
-import com.interview.interviewservice.service.UserContextService;
-import com.interview.interviewservice.service.UserService;
+import com.interview.interviewservice.service.*;
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -39,7 +43,8 @@ public class CompanyServiceImpl implements CompanyService {
     private final TeamMapper teamMapper;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private ISearchService iSearchService;
+
 
     private final UserContextService userContextService;
 
@@ -136,6 +141,31 @@ public class CompanyServiceImpl implements CompanyService {
         }else{
             throw new CustomException("Company Info Not found");
         }
+    }
+
+    @Override
+    public List<KeyValuePair> companySearch(String query) throws Exception {
+        List<KeyValuePair> results = new ArrayList<>();
+        String[] COMPANY_FIELDS = {"companyName", "country"};
+        ResultQuery resultQuery = iSearchService.searchFromQuery(query, COMPANY_FIELDS, "company/", "");
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ElasticSearchResponse<CompanyModel>> elasticSearchResponses = objectMapper.readValue(resultQuery.getElements(),
+                    new TypeReference<List<ElasticSearchResponse<CompanyModel>>>() {});
+
+            if(!elasticSearchResponses.isEmpty()){
+                for(ElasticSearchResponse elasticSearchResponse: elasticSearchResponses){
+                    CompanyModel companyModel = (CompanyModel) elasticSearchResponse.getSource();
+                    KeyValuePair keyValuePair = new KeyValuePair(companyModel.getId(), companyModel.getCompanyName()+" ("+companyModel.getCountry()+")");
+                    results.add(keyValuePair);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+
+        return results;
     }
 
     @Override

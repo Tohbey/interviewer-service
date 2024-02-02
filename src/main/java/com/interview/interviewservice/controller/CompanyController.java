@@ -157,4 +157,18 @@ public class CompanyController {
         }
         return dataResponse;
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = BaseResource.SEARCH)
+    public IDataResponse search(@RequestParam("query") String query){
+        IDataResponse dataResponse = new IDataResponse();
+        try {
+            dataResponse.setData(Collections.singletonList(companyService.companySearch(query)));
+            dataResponse.setValid(true);
+            dataResponse.addMessage(new GlobalMessage("User Successfully Updated","Deleted", Message.Severity.SUCCESS));
+        }catch (Exception e) {
+            dataResponse.setValid(false);
+            dataResponse.addMessage(new GlobalMessage(e.getMessage(), null, Message.Severity.ERROR));
+        }
+        return dataResponse;
+    }
 }

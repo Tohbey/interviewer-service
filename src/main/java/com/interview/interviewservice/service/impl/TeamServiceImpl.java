@@ -79,7 +79,7 @@ public class TeamServiceImpl implements TeamService {
 
         team = teamRepository.save(team);
 
-        if(teamDTO.getInvites().size() > 0){
+        if(!teamDTO.getInvites().isEmpty()){
             Team finalTeam = team;
             teamDTO.getInvites().forEach(invite -> {
                 invite.setTeamId(finalTeam.getId());
@@ -92,7 +92,7 @@ public class TeamServiceImpl implements TeamService {
         }
 
 
-        if(teamDTO.getTeamMembers().size() > 0){
+        if(!teamDTO.getTeamMembers().isEmpty()){
             Team finalTeam = team;
             teamDTO.getTeamMembers().forEach(teamMember -> {
                 Optional<User> user = userRepository.findById(teamMember.getId());
@@ -118,7 +118,7 @@ public class TeamServiceImpl implements TeamService {
             team.get().setLastModifiedBy(userContextService.getCurrentUserDTO().getFullname());
 
             List<Invites> invites = invitesRepository.findAllByTeam(team.get());
-            if(invites.size() > 0) {
+            if(!invites.isEmpty()) {
                 invites.forEach(invite ->{
                     invite.setTeam(null);
                     invitesRepository.save(invite);
@@ -126,7 +126,7 @@ public class TeamServiceImpl implements TeamService {
             }
 
             List<User> users = userRepository.findUserByTeamsContains(team.get());
-            if(users.size() > 0) {
+            if(!users.isEmpty()) {
                 users.forEach(user -> {
                     user.getTeams().remove(team.get());
 
@@ -176,7 +176,7 @@ public class TeamServiceImpl implements TeamService {
         TeamDTO teamDTO = find(teamId);
 
         if(Objects.nonNull(teamDTO)){
-            if(teamMemberAndInvite.getInvites().size() > 0){
+            if(!teamMemberAndInvite.getInvites().isEmpty()){
                 teamMemberAndInvite.getInvites().forEach(invite -> {
                     try {
                         InvitesDTO inviteDTO = invitesService.find(invite);
@@ -190,7 +190,7 @@ public class TeamServiceImpl implements TeamService {
                 });
             }
 
-            if(teamMemberAndInvite.getUserIds().size() > 0){
+            if(!teamMemberAndInvite.getUserIds().isEmpty()){
                 teamMemberAndInvite.getUserIds().forEach(userId  -> {
                     try {
                         UserDTO userDTO = userService.find(userId);
@@ -214,7 +214,7 @@ public class TeamServiceImpl implements TeamService {
         Optional<Team> team = teamRepository.findById(teamId);
 
         if(team.isPresent()) {
-            if(teamMemberAndInvite.getInvites().size() > 0){
+            if(!teamMemberAndInvite.getInvites().isEmpty()){
                 teamMemberAndInvite.getInvites().forEach(invite -> {
                     Optional<Invites> savedInvite = invitesRepository.findByIdAndTeam(invite, team.get());
                     if(savedInvite.isPresent()){
@@ -230,7 +230,7 @@ public class TeamServiceImpl implements TeamService {
                 });
             }
 
-            if(teamMemberAndInvite.getUserIds().size() > 0){
+            if(!teamMemberAndInvite.getUserIds().isEmpty()){
                 teamMemberAndInvite.getUserIds().forEach(userId  -> {
                     Optional<User> savedUser = userRepository.findUserByIdAndTeams(userId, team.get());
                     if(savedUser.isPresent()){

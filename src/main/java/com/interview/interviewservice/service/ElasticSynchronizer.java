@@ -166,7 +166,7 @@ public class ElasticSynchronizer {
 
         for(Company company: companies){
             int i = 0;
-            CompanyModel companyModel = new CompanyModel(company.getId(), company.getCompanyName(), company.getCountry(), "");
+            CompanyModel companyModel = new CompanyModel(company.getId(), company.getCompanyName(), company.getCountry().getDescription(), "");
             logger.info("Syncing Company - {}", i);
             iCompanyERepo.save(companyModel);
             i+=1;

@@ -8,6 +8,7 @@ public class CompanyDTO extends BaseDTO {
     private String companyId;
     private String picture;
     private String address;
+    private Long countryId;
     private String country;
     private String companyName;
     private ContactData contactData;

@@ -16,6 +16,7 @@ import com.interview.interviewservice.mapper.mappers.TeamMapper;
 import com.interview.interviewservice.model.Flag;
 import com.interview.interviewservice.model.RoleEnum;
 import com.interview.interviewservice.repository.CompanyRepository;
+import com.interview.interviewservice.repository.NationalityRepository;
 import com.interview.interviewservice.repository.TeamRepository;
 import com.interview.interviewservice.service.*;
 import jakarta.mail.MessagingException;
@@ -45,6 +46,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private ISearchService iSearchService;
 
+    @Autowired
+    private NationalityRepository nationalityRepository;
 
     private final UserContextService userContextService;
 
@@ -74,6 +77,7 @@ public class CompanyServiceImpl implements CompanyService {
         validate(companyDTO);
         Company company = companyMapper.companyDTOToCompany(companyDTO);
         company.setCompanyId(company.getCompanyId().concat(company.getCompanyName().substring(0,2)));
+        company.setCountry(nationalityRepository.findById(companyDTO.getCountryId()).get());
         company.setFlag(Flag.ENABLED);
 
         company = companyRepository.save(company);

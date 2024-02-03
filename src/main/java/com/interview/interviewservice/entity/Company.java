@@ -17,7 +17,11 @@ public class Company extends FlagableAuditableEntity {
     private ContactData contactData;
     private String picture;
     private String address;
-    private String country;
+
+    @JoinColumn(name = "COUNTRY_ID", referencedColumnName = "ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Nationality country;
+
 
     @Data
     @Embeddable
